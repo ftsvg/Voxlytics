@@ -1,0 +1,379 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+:root {
+    --font-family: "Inter", sans-serif;
+    --bg-color: #111111;
+    --bg-color-rgb: 17, 17, 17;
+    --primary-color: #5555FF;
+    --primary-color-hover: #3333ff;
+    --text-color: #f4f4f5;
+    --text-color-muted: #a1a1aa;
+    --border-radius: 10px;
+    --border-color: #2a2a2a;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-family);
+}
+
+body,
+html {
+    background: var(--bg-color);
+    overflow-x: hidden;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    height: 70px;
+    display: flex;
+    align-items: center;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.nav .brand-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    text-decoration: none;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav .brand-title img {
+    height: 40px;
+    width: auto;
+    display: block;
+}
+
+.nav .brand-title:hover {
+    transform: translateY(-2px);
+}
+
+.nav .brand-name {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.btns {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55em 1.1em;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: var(--text-color);
+    border: 1px solid var(--primary-color);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.hero {
+    position: relative;
+    width: 100%;
+    height: 800px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    clip-path: ellipse(120% 100% at 50% 0%);
+    z-index: 1;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("../images/background.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(6px);
+    transform: scale(1.05);
+    z-index: 0;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    color: var(--text-color);
+    max-width: 700px;
+    padding: 1em;
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.hero-content p {
+    color: var(--text-color-muted);
+    font-size: 1.1rem;
+    max-width: 420px;
+    line-height: 1.5;
+}
+
+.btn.btn-primary.discord {
+    display: inline-flex;
+    align-items: center;
+    gap: .25em;
+}
+
+.btn.btn-primary.discord iconify-icon {
+    font-size: 1.5em;
+}
+
+.section {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 100px;
+    margin-top: 150px;
+    padding: 0 2rem;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+    flex: 1;
+}
+
+.info-title {
+    font-size: 2.5em;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.info-description {
+    color: var(--text-color-muted);
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+
+.command {
+    background: rgba(88, 101, 242, 0.15);
+    color: #5865F2;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid rgba(88, 101, 242, 0.25);
+    display: inline-block;
+}
+
+.showcase {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.showcase img {
+    width: 100%;
+    max-width: 650px;
+    height: auto;
+    border-radius: 12px;
+}
+
+.invite {
+    max-width: 800px;
+    width: 100%;
+    margin: 100px auto 50px auto;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--border-radius);
+    background-color: #1f1f1f;
+    padding: 2em;
+    text-align: center;
+}
+
+.invite-heading {
+    color: var(--text-color);
+}
+
+.invite-description {
+    color: var(--text-color-muted);
+    margin-bottom: 1.5em;
+}
+
+.btn.btn-outline.join {
+    display: none;
+}
+
+.footer {
+    padding: 2em 1em;
+    text-align: center;
+    background: var(--bg-color);
+    color: var(--text-color);
+}
+
+.footer-top {
+    font-size: 0.95rem;
+    margin-bottom: 1em;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.footer-links a {
+    color: var(--text-color-muted);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s ease-in-out
+}
+
+.footer-links a:hover {
+    color: var(--primary-color);
+}
+
+.footer {
+    flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+
+    .section {
+        flex-direction: column;
+        gap: 20px;
+        text-align: left;
+        padding: 0 1em;
+        margin-bottom: 50px !important;
+    }
+
+    .section .showcase {
+        order: 0;
+        width: 100%;
+    }
+
+    .section .info {
+        order: 1;
+        width: 100%;
+    }
+
+    .section:nth-of-type(even) .showcase {
+        order: 0;
+    }
+
+    .section:nth-of-type(even) .info {
+        order: 1;
+    }
+
+    .showcase img {
+        max-width: 100%;
+    }
+
+    .info-title {
+        font-size: 2em;
+    }
+
+    .hero-content h1 {
+        font-size: 2.2rem;
+    }
+
+    .hero-content p {
+        font-size: 1rem;
+        max-width: 320px;
+    }
+
+    .btns {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .nav .btns {
+        display: none;
+    }
+
+    .nav {
+        justify-content: center;
+    }
+
+    .btn.btn-outline.join {
+        display: inline-flex;
+    }
+}
+
+@media (max-width: 500px) {
+
+    .hero {
+        height: 650px;
+    }
+
+    .hero-content {
+        padding: 1em;
+    }
+
+    .invite {
+        margin: 60px 1em;
+        padding: 1.5em;
+        max-width: calc(100% - 2em);
+    }
+
+    .invite-heading {
+        font-size: 1.5em;
+    }
+
+    .invite-description {
+        font-size: 1em;
+    }
+}

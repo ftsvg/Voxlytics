@@ -1,0 +1,15 @@
+{% macro render_header() %}
+<header class="header">
+    <nav class="nav">
+        <a href="{{ url_for('index') }}" class="brand-title">
+            <img src="{{url_for('static', filename='images/logo.png')}}" alt="Voxlytics Logo">
+            <span class="brand-name">Voxlytics</span>
+        </a>
+
+        <div class="btns">
+            <a href="{{url_for('invite')}}" class="btn btn-primary">Add to Server</a>
+            <a href="{{url_for('discord')}}" class="btn btn-outline">Join Discord</a>
+        </div>
+    </nav>
+</header>
+{% endmacro %}

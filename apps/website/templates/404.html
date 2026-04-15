@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "components/header.html" import render_header %}
+{% from "components/footer.html" import render_footer %}
+
+{% block head %}
+<title>404 - Voxlytics</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+<link rel="icon" type="image/png" href="{{url_for('static', filename='images/logo_small.png')}}">
+{% endblock %}
+
+{% block body %}
+{{ render_header() }}
+
+<main class="hero">
+    <div class="hero-content">
+        <h1 class="error-code">404</h1>
+        <p>Page not found</p>
+        <div class="btns">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">Go back home</a>
+        </div>
+    </div>
+</main>
+
+{{ render_footer() }}
+{% endblock %}
