@@ -1,0 +1,13 @@
+aiohttp
+aiohttp_client_cache
+discord.py
+mcfetch
+mctextrender
+Pillow
+pymysql
+python-dotenv
+python_dateutil
+requests_cache
+aiosqlite
+cachetools
+cachetools_async

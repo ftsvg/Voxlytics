@@ -1,0 +1,75 @@
+<svg width="820" height="460" viewBox="0 0 820 460" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <filter id="shadow-219469091" color-interpolation-filters="sRGB">
+            <!-- Offset the colored text -->
+            <feOffset dx="3" dy="3" in="SourceGraphic" result="offsetColor"/>
+            <!-- Blur it -->
+            <feGaussianBlur in="offsetColor" stdDeviation="0" result="blurredColor"/>
+            <!-- Darken by 75% (multiply RGB by 0.25) -->
+            <feColorMatrix in="blurredColor" result="darkenedShadow" type="matrix" values="0.25 0    0    0  0
+                     0    0.25 0    0  0
+                     0    0    0.25 0  0
+                     0    0    0    1  0"/>
+            <!-- Fade it -->
+            <feComponentTransfer in="darkenedShadow" result="fadedShadow">
+                <feFuncA type="linear" slope="1"/>
+            </feComponentTransfer>
+            <!-- Put original text on top -->
+            <feMerge>
+                <feMergeNode in="fadedShadow"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+        <filter id="shadow-1349600516">
+            <feDropShadow dx="3" dy="3" stdDeviation="0" flood-opacity="1" flood-color="#404040"/>
+        </filter>
+        <filter id="shadow-1558331316">
+            <feDropShadow dx="3" dy="3" stdDeviation="0" flood-opacity="1" flood-color="#154015"/>
+        </filter>
+        <filter id="shadow--1000158796">
+            <feDropShadow dx="3" dy="3" stdDeviation="0" flood-opacity="1" flood-color="#151540"/>
+        </filter>
+        <filter id="shadow--978910628">
+            <feDropShadow dx="3" dy="3" stdDeviation="0" flood-opacity="1" flood-color="#401540"/>
+        </filter>
+        <filter id="shadow--748931660">
+            <feDropShadow dx="3" dy="3" stdDeviation="0" flood-opacity="1" flood-color="#401515"/>
+        </filter>
+        <filter id="shadow-1579579484">
+            <feDropShadow dx="3" dy="3" stdDeviation="0" flood-opacity="1" flood-color="#404015"/>
+        </filter>
+    </defs>
+    <text filter="url(#shadow-219469091)" fractyl-id="displayname" x="55" y="60.5" text-anchor="start" dominant-baseline="central" font-family="Minecraft" font-size="20" font-weight="400" fill="{displayname#fill}">
+        {displayname#text}
+    </text>
+    <text filter="url(#shadow-219469091)" fractyl-id="level" x="310" y="115.5" text-anchor="start" dominant-baseline="central" font-family="Minecraft" font-size="18" font-weight="400" fill="{level#fill}">
+        {level#text}
+    </text>
+    <text filter="url(#shadow-219469091)" fractyl-id="level_next" x="760" y="115.5" text-anchor="end" dominant-baseline="central" font-family="Minecraft" font-size="18" font-weight="400" fill="{level_next#fill}">
+        {level_next#text}
+    </text>
+    <text filter="url(#shadow-219469091)" fractyl-id="xp_progress" x="535" y="113.5" text-anchor="middle" dominant-baseline="central" font-family="Minecraft" font-size="14" font-weight="400" fill="{xp_progress#fill}">
+        {xp_progress#text}
+    </text>
+    <text filter="url(#shadow-219469091)" fractyl-id="footer" x="410" y="400.5" text-anchor="middle" dominant-baseline="central" font-family="Minecraft" font-size="16" font-weight="400" fill="{footer#fill}">
+        {footer#text}
+    </text>
+    <text filter="url(#shadow-1349600516)" fractyl-id="title" x="534" y="194.5" text-anchor="middle" dominant-baseline="central" font-family="Minecraft" font-size="14" font-weight="400" fill="#ffffff">
+        {title#text}
+    </text>
+    <text filter="url(#shadow-1558331316)" fractyl-id="wins" x="410" y="266.5" text-anchor="middle" dominant-baseline="central" font-family="Minecraft" font-size="20" font-weight="400" fill="#55ff55">
+        {wins#text}
+    </text>
+    <text filter="url(#shadow--1000158796)" fractyl-id="weighted" x="660" y="266.5" text-anchor="middle" dominant-baseline="central" font-family="Minecraft" font-size="20" font-weight="400" fill="#5555ff">
+        {weighted#text}
+    </text>
+    <text filter="url(#shadow--978910628)" fractyl-id="kills" x="369" y="346.5" text-anchor="middle" dominant-baseline="central" font-family="Minecraft" font-size="20" font-weight="400" fill="#ff55ff">
+        {kills#text}
+    </text>
+    <text filter="url(#shadow--748931660)" fractyl-id="finals" x="535" y="346.5" text-anchor="middle" dominant-baseline="central" font-family="Minecraft" font-size="20" font-weight="400" fill="#ff5555">
+        {finals#text}
+    </text>
+    <text filter="url(#shadow-1579579484)" fractyl-id="beds" x="702" y="346.5" text-anchor="middle" dominant-baseline="central" font-family="Minecraft" font-size="20" font-weight="400" fill="#ffff55">
+        {beds#text}
+    </text>
+</svg>
