@@ -6,4 +6,3 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY")
-    STATIC_FOLDER = os.environ.get("STATIC_FOLDER")

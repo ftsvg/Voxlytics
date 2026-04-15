@@ -1,6 +1,14 @@
+import os
 from flask import Flask, redirect, render_template, Response, url_for
 from config import Config
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+app = Flask(
+    __name__,
+    static_folder=os.path.join(BASE_DIR, "static"),
+    template_folder=os.path.join(BASE_DIR, "templates")
+)
 
 app = Flask(__name__)
 app.config.from_object(Config)
