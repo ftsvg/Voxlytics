@@ -1,3 +1,4 @@
+from typing import Any
 from dataclasses import dataclass
 
 
@@ -32,3 +33,16 @@ class Historical:
     star: int
     xp: int
     last_reset: int
+
+
+@dataclass(slots=True)
+class LeaderboardChannel:
+    guild_id: int
+    channel_id: int
+
+
+@dataclass(slots=True)
+class LeaderboardSnapshot:
+    type: str
+    data: dict[str, Any]
+    updated_at: int
