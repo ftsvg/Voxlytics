@@ -93,7 +93,7 @@ class Lactate(commands.Cog):
         await interaction.response.defer()
 
         try:
-            result = await interaction_check(interaction.user.id, 'lactate')
+            result = await interaction_check(interaction.user.id, 'lactate_leaderboard')
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
@@ -146,8 +146,7 @@ class Lactate(commands.Cog):
     async def use_error(self, interaction: Interaction, error: app_commands.AppCommandError):
         if isinstance(error, app_commands.CommandOnCooldown):
             return await interaction.response.send_message(
-                f"You're on cooldown! Try again in {error.retry_after:.1f}s",
-                ephemeral=True
+                f"You're on cooldown! Try again in **{error.retry_after:.1f}s**",
             )
 
 
