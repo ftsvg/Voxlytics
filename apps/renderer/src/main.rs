@@ -48,6 +48,10 @@ async fn main() {
             schema::load_schema_from_file("./templates/historical/schema.json")
                 .unwrap(),
             "/historical",
+        ).add_renderer(
+            schema::load_schema_from_file("./templates/leaderboard_lactate/schema.json")
+                .unwrap(),
+            "/leaderboard-lactate",
         );
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3001")
