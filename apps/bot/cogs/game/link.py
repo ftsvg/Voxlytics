@@ -2,7 +2,7 @@ from discord.ext import commands
 from discord import app_commands, Interaction
 from mcfetch import Player
 
-from core import check_if_valid_ign, mojang_session, logger
+from core import check_if_valid_ign, interaction_check, mojang_session, logger
 from core.database.handlers import UserHandler
 
 
@@ -25,6 +25,12 @@ class Linking(commands.Cog):
     ):
         await interaction.response.defer()
         try:
+            result = await interaction_check(interaction.user.id, 'compare')
+            if result.status == "blacklisted":
+                return await interaction.edit_original_response(
+                    content=result.message
+                )
+
             if not (uuid := await check_if_valid_ign(interaction, player)):
                 return None
             
@@ -57,6 +63,12 @@ class Linking(commands.Cog):
     ):
         await interaction.response.defer()
         try:
+            result = await interaction_check(interaction.user.id, 'compare')
+            if result.status == "blacklisted":
+                return await interaction.edit_original_response(
+                    content=result.message
+                )
+
             handler = UserHandler(interaction.user.id)
             user = handler.get_player()
 

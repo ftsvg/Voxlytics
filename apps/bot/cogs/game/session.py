@@ -4,7 +4,7 @@ import mcfetch
 from discord.ext import commands
 from discord import app_commands, Interaction, File
 
-from core import mojang_session
+from core import mojang_session, interaction_check
 from core.calc import SessionStats
 from core.api.helpers import PlayerInfo
 from core.api import SKINS_API
@@ -81,6 +81,17 @@ class Session(commands.Cog):
     ):
         await interaction.response.defer()
         try:
+            content_parts = []
+
+            result = await interaction_check(interaction.user.id, 'compare')
+            if result.status == "blacklisted":
+                return await interaction.edit_original_response(
+                    content=result.message
+                )
+                
+            if result.status == "new_user":
+                content_parts.append(result.message)
+
             handler = UserHandler(interaction.user.id)
             user = handler.get_player()
 
@@ -119,8 +130,12 @@ class Session(commands.Cog):
             img_bytes = await renderer.render_to_buffer()
             start_time = session.start_time
 
+            content_parts.append(
+                f"<a:mc_clock:1494030376505708575> Started on <t:{start_time}:F>"
+            )
+
             await interaction.edit_original_response(
-                content=f"<a:mc_clock:1494030376505708575> Started on <t:{start_time}:F>",
+                content="\n\n".join(content_parts),
                 attachments=[File(img_bytes, filename=f"session.png")]
             )            
             
@@ -142,6 +157,12 @@ class Session(commands.Cog):
     ):
         await interaction.response.defer()
         try:
+            result = await interaction_check(interaction.user.id, 'compare')
+            if result.status == "blacklisted":
+                return await interaction.edit_original_response(
+                    content=result.message
+                )
+
             handler = UserHandler(interaction.user.id)
             user = handler.get_player()
 

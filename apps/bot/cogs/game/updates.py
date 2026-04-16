@@ -1,7 +1,7 @@
 from discord.ext import commands
 from discord import app_commands, Interaction, TextChannel
 
-from core import logger
+from core import logger, interaction_check
 from core.database.handlers import LeaderboardHandler
 
 
@@ -16,6 +16,12 @@ class Updates(commands.Cog):
     async def updates(self, interaction: Interaction, channel: TextChannel):
         await interaction.response.defer()
         try:
+            result = await interaction_check(interaction.user.id, 'compare')
+            if result.status == "blacklisted":
+                return await interaction.edit_original_response(
+                    content=result.message
+                )
+
             if not interaction.user.guild_permissions.administrator:
                 return await interaction.edit_original_response(
                     content=(

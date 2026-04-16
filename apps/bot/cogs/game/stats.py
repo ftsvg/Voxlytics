@@ -4,7 +4,7 @@ import mcfetch
 from discord.ext import commands
 from discord import app_commands, Interaction, File
 
-from core import logger, mojang_session, MODES, fetch_player
+from core import logger, mojang_session, MODES, fetch_player, interaction_check
 from core.api import SKINS_API
 from core.stats import StatsRenderer, StatsView
 
@@ -34,6 +34,17 @@ class Stats(commands.Cog):
     ):
         await interaction.response.defer()
         try:
+            content_parts = []
+
+            result = await interaction_check(interaction.user.id, 'compare')
+            if result.status == "blacklisted":
+                return await interaction.edit_original_response(
+                    content=result.message
+                )
+                
+            if result.status == "new_user":
+                content_parts.append(result.message)
+
             if not (result := await fetch_player(interaction, player)):
                 return None
 
@@ -63,8 +74,12 @@ class Stats(commands.Cog):
                 username=name,
             )
 
+            content_parts.append(
+                f"Last login time: <t:{player_data.last_login_time}:R>"
+            )
+
             await interaction.edit_original_response(
-                content=f"Last login time: <t:{player_data.last_login_time}:R>",
+                content="\n\n".join(content_parts),
                 attachments=[File(img_bytes, filename=f"stats_{mode}.png")],
                 view=view,
             ) 

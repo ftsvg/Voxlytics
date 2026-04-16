@@ -4,7 +4,7 @@ from mcfetch import Player
 from discord.ext import commands
 from discord import app_commands, Interaction, File
 
-from core import logger, fetch_player, mojang_session
+from core import logger, fetch_player, mojang_session, interaction_check
 from core.render2 import RenderingClient, PlaceholderValues, TSpan
 from core.api.helpers import PlayerInfo
 from core.api import SKINS_API
@@ -121,6 +121,17 @@ class Prestige(commands.Cog):
     ):
         await interaction.response.defer()
         try:
+            content = None
+
+            result = await interaction_check(interaction.user.id, 'compare')
+            if result.status == "blacklisted":
+                return await interaction.edit_original_response(
+                    content=result.message
+                )
+            
+            if result.status == "new_user":
+                content = result.message
+
             if not (result := await fetch_player(interaction, player)):
                 return None
 
@@ -170,6 +181,7 @@ class Prestige(commands.Cog):
 
             img_bytes = await renderer.render_to_buffer()
             await interaction.edit_original_response(
+                content=content,
                 attachments=[File(img_bytes, filename=f"projected.png")]
             )            
 

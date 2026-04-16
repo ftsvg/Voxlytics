@@ -1,7 +1,7 @@
 from discord.ext import commands
 from discord import app_commands, Interaction
 
-from core import historical_interaction, logger, PERIODS
+from core import historical_interaction, logger, PERIODS, interaction_check
 from core.database.handlers import UserHandler, HistoricalHandler
 from core.api.helpers import PlayerInfo
 
@@ -73,6 +73,12 @@ class Historical(commands.Cog):
     ):
         await interaction.response.defer()
         try:
+            result = await interaction_check(interaction.user.id, 'compare')
+            if result.status == "blacklisted":
+                return await interaction.edit_original_response(
+                    content=result.message
+                )
+
             user_handler = UserHandler(interaction.user.id)
             user = user_handler.get_player()
 

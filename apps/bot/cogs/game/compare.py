@@ -6,7 +6,7 @@ from mcfetch import Player
 from discord.ext import commands
 from discord import app_commands, Interaction, File
 
-from core import fetch_player, logger, mojang_session
+from core import fetch_player, logger, mojang_session, interaction_check
 from core.render2 import RenderingClient, PlaceholderValues, TSpan
 from core.api import SKINS_API
 from core.api.helpers import PlayerInfo
@@ -147,6 +147,17 @@ class Compare(commands.Cog):
         await interaction.response.defer()
 
         try:
+            content = None
+
+            result = await interaction_check(interaction.user.id, 'compare')
+            if result.status == "blacklisted":
+                return await interaction.edit_original_response(
+                    content=result.message
+                )
+            
+            if result.status == "new_user":
+                content = result.message
+
             results = await asyncio.gather(
                 self._get_player_data(interaction, player_1),
                 self._get_player_data(interaction, player_2),
@@ -175,6 +186,7 @@ class Compare(commands.Cog):
             img_bytes = await renderer.render_to_buffer()
 
             await interaction.edit_original_response(
+                content=content,
                 attachments=[File(img_bytes, filename="compare.png")]
             )
 
