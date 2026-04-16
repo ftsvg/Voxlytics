@@ -16,7 +16,7 @@ class Updates(commands.Cog):
     async def updates(self, interaction: Interaction, channel: TextChannel):
         await interaction.response.defer()
         try:
-            result = await interaction_check(interaction.user.id, 'compare')
+            result = await interaction_check(interaction.user.id, 'updates')
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message

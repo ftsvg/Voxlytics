@@ -25,7 +25,7 @@ class Linking(commands.Cog):
     ):
         await interaction.response.defer()
         try:
-            result = await interaction_check(interaction.user.id, 'compare')
+            result = await interaction_check(interaction.user.id, 'link')
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
@@ -63,7 +63,7 @@ class Linking(commands.Cog):
     ):
         await interaction.response.defer()
         try:
-            result = await interaction_check(interaction.user.id, 'compare')
+            result = await interaction_check(interaction.user.id, 'unlink')
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message

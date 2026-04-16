@@ -34,16 +34,11 @@ class Stats(commands.Cog):
     ):
         await interaction.response.defer()
         try:
-            content_parts = []
-
-            result = await interaction_check(interaction.user.id, 'compare')
+            result = await interaction_check(interaction.user.id, 'stats')
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
                 )
-                
-            if result.status == "new_user":
-                content_parts.append(result.message)
 
             if not (result := await fetch_player(interaction, player)):
                 return None
@@ -74,12 +69,8 @@ class Stats(commands.Cog):
                 username=name,
             )
 
-            content_parts.append(
-                f"Last login time: <t:{player_data.last_login_time}:R>"
-            )
-
             await interaction.edit_original_response(
-                content="\n\n".join(content_parts),
+                content=f"Last login time: <t:{player_data.last_login_time}:R>",
                 attachments=[File(img_bytes, filename=f"stats_{mode}.png")],
                 view=view,
             ) 

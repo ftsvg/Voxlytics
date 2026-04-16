@@ -22,13 +22,6 @@ async def interaction_check(
 
     if not account:
         account_handler.create()
-        return InteractionResult(
-            status="new_user",
-            message=(
-                "Hey there! It looks like this is your first time here. 👋\n"
-                "If you need help getting started, check out `/help`."
-            )
-        )
     
     if account.blacklisted:
         return InteractionResult(

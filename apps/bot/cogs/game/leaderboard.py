@@ -30,8 +30,7 @@ class Leaderboard(commands.Cog):
         self,
         interaction: Interaction,
         lb_type: str,
-        page: int,
-        content: str | None = None
+        page: int
     ):
         data = await LeaderboardInfo.fetch_leaderboard(
             _type=lb_type,
@@ -71,7 +70,6 @@ class Leaderboard(commands.Cog):
         )
 
         msg = await interaction.edit_original_response(
-            content=content,
             attachments=[File(img_bytes, filename="leaderboard.png")],
             view=view,
         )
@@ -85,18 +83,13 @@ class Leaderboard(commands.Cog):
     async def level(self, interaction: Interaction, page: int = 1):
         await interaction.response.defer()
         try:
-            content = None
-
-            result = await interaction_check(interaction.user.id, 'compare')
+            result = await interaction_check(interaction.user.id, 'leaderboard_level')
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
                 )
-            
-            if result.status == "new_user":
-                content = result.message
 
-            await self._send_leaderboard(interaction, "level", page, content)
+            await self._send_leaderboard(interaction, "level", page)
 
         except Exception as error:
             logger.exception(f"Unhandled exception: {error}")
@@ -114,18 +107,13 @@ class Leaderboard(commands.Cog):
     async def weightedwins(self, interaction: Interaction, page: int = 1):
         await interaction.response.defer()
         try:
-            content = None
-
-            result = await interaction_check(interaction.user.id, 'compare')
+            result = await interaction_check(interaction.user.id, 'leaderboard_weightedwins')
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
                 )
-            
-            if result.status == "new_user":
-                content = result.message
 
-            await self._send_leaderboard(interaction, "weightedwins", page, content)
+            await self._send_leaderboard(interaction, "weightedwins", page)
 
         except Exception as error:
             logger.exception(f"Unhandled exception: {error}")

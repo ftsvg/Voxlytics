@@ -74,16 +74,11 @@ async def historical_interaction(
     player: str | None    
 ) -> None:
     try:
-        content_parts = []
-
-        result = await interaction_check(interaction.user.id, 'compare')
+        result = await interaction_check(interaction.user.id, f'historical_{period.lower()}')
         if result.status == "blacklisted":
             return await interaction.edit_original_response(
                 content=result.message
             )
-            
-        if result.status == "new_user":
-            content_parts.append(result.message)
 
         if not (result := await fetch_player(interaction, player)):
             return None
@@ -119,13 +114,9 @@ async def historical_interaction(
         
         reset = historical_data.last_reset
         next_reset = reset + PERIOD_SECONDS[period]
-        
-        content_parts.append(
-            f"<a:mc_clock:1494030376505708575> Resets in <t:{next_reset}:R>"
-        )
 
         await interaction.edit_original_response(
-            content="\n\n".join(content_parts),
+            content=f"<a:mc_clock:1494030376505708575> Resets in <t:{next_reset}:R>",
             attachments=[File(img_bytes, filename=f"historical_{period}.png")]
         )       
 

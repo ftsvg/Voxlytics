@@ -147,16 +147,11 @@ class Compare(commands.Cog):
         await interaction.response.defer()
 
         try:
-            content = None
-
             result = await interaction_check(interaction.user.id, 'compare')
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
                 )
-            
-            if result.status == "new_user":
-                content = result.message
 
             results = await asyncio.gather(
                 self._get_player_data(interaction, player_1),
@@ -186,7 +181,6 @@ class Compare(commands.Cog):
             img_bytes = await renderer.render_to_buffer()
 
             await interaction.edit_original_response(
-                content=content,
                 attachments=[File(img_bytes, filename="compare.png")]
             )
 
