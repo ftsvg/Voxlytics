@@ -22,6 +22,7 @@ async def interaction_check(
 
     if not account:
         account_handler.create()
+        account = account_handler.get_account()
     
     if account.blacklisted:
         return InteractionResult(
