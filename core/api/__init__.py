@@ -1,12 +1,13 @@
 from .endpoints import VoxylApiEndpoint
-from .request import VoxylAPI, API, SKINS_API
-from .cache import MySQLCache
-
+from .request import VoxylAPI, SkinAPI
+from .cache import Cache
+from .services import API, SKINS_API
 
 __all__ = [
     "VoxylApiEndpoint",
     "VoxylAPI",
-    "MySQLCache",
+    "Cache",
+    "SkinAPI",
     "API",
     "SKINS_API"
 ]

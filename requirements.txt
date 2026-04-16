@@ -11,3 +11,4 @@ requests_cache
 aiosqlite
 cachetools
 cachetools_async
+redis

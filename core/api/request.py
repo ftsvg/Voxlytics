@@ -5,7 +5,7 @@ import time
 from typing import Any, Optional, Literal
 from dotenv import load_dotenv
 
-from .cache import MySQLCache
+from .cache import Cache
 from .endpoints import VoxylApiEndpoint
 
 load_dotenv()
@@ -14,10 +14,10 @@ load_dotenv()
 class VoxylAPI:
     def __init__(
         self,
-        cache: MySQLCache,
+        cache: Cache,
         *,
         base_url: str = "https://api.voxyl.net",
-        api_key: str = os.environ.get("API_KEY", ""),
+        api_key: str = os.getenv("API_KEY", "")
     ):
         self.base_url = base_url
         self.api_key = api_key
@@ -36,11 +36,16 @@ class VoxylAPI:
             await self.session.close()
             self.session = None
 
-    def _make_cache_key(self, endpoint: VoxylApiEndpoint, params: dict) -> str:
+    def _cache_key(self, endpoint: VoxylApiEndpoint, params: dict) -> str:
         return self.cache.make_key(endpoint.value, params)
 
     async def request(
-        self, endpoint: VoxylApiEndpoint, *, ttl: int = 300, retries: int = 3, **params
+        self,
+        endpoint: VoxylApiEndpoint,
+        *,
+        ttl: int = 300,
+        retries: int = 3,
+        **params
     ) -> Any:
 
         await self.start()
@@ -48,7 +53,7 @@ class VoxylAPI:
         request_params = dict(params)
         request_params["api"] = self.api_key
 
-        cache_key = self._make_cache_key(endpoint, params)
+        cache_key = self._cache_key(endpoint, params)
 
         cached = self.cache.get(cache_key)
         if cached is not None:
@@ -69,20 +74,23 @@ class VoxylAPI:
                         except Exception:
                             data = text
 
-                        self.cache.set(cache_key, endpoint.value, data, ttl)
+                        self.cache.set(cache_key, data, ttl)
                         return data
 
                     if resp.status == 429:
-                        await asyncio.sleep(2**attempt)
+                        await asyncio.sleep(2 ** attempt)
                         continue
 
                     return {"error": resp.status, "data": text}
 
             except Exception as e:
                 last_error = e
-                await asyncio.sleep(2**attempt)
+                await asyncio.sleep(2 ** attempt)
 
-        return {"error": "request_failed", "detail": str(last_error)}
+        return {
+            "error": "request_failed",
+            "detail": str(last_error)
+        }
 
 
 SkinStyle = Literal[
@@ -103,9 +111,9 @@ DEFAULT_STEVE_SKIN_URL = (
 
 
 class SkinAPI:
-    def __init__(self, cache: MySQLCache):
+    def __init__(self, cache: Cache):
         self.cache = cache
-        self.session: aiohttp.ClientSession | None = None
+        self.session: Optional[aiohttp.ClientSession] = None
 
     async def start(self):
         if self.session is None or self.session.closed:
@@ -119,28 +127,29 @@ class SkinAPI:
             await self.session.close()
             self.session = None
 
-    def _make_key(self, uuid: str, style: SkinStyle) -> str:
-        return self.cache.make_key(
-            "skin_model",
-            {"uuid": uuid, "style": style},
-        )
+    def _key(self, uuid: str, style: SkinStyle) -> str:
+        return self.cache.make_key("skin_model", {
+            "uuid": uuid,
+            "style": style
+        })
 
     async def fetch_skin_model(
         self,
         uuid: str,
         style: SkinStyle = "full",
     ) -> bytes:
+
         await self.start()
 
-        cache_key = self._make_key(uuid, style)
+        cache_key = self._key(uuid, style)
 
         cached = self.cache.get(cache_key)
         if cached is not None:
-            return bytes(cached)
+            if isinstance(cached, list):
+                return bytes(cached)
+            return cached
 
-        base_url = "https://visage.surgeplay.com"
-        url = f"{base_url}/{style}/256/{uuid}"
-
+        url = f"https://visage.surgeplay.com/{style}/256/{uuid}"
         headers = {"User-Agent": "Voxyl Client"}
 
         try:
@@ -148,31 +157,14 @@ class SkinAPI:
                 if res.status == 200:
                     data = await res.read()
 
-                    self.cache.set(
-                        cache_key,
-                        "skin_model",
-                        list(data),
-                        ttl=3600,
-                    )
-
+                    self.cache.set(cache_key, list(data), ttl=3600)
                     return data
 
-                raise Exception(f"Skin fetch failed with status {res.status}")
+                raise Exception(f"Skin fetch failed: {res.status}")
 
         except Exception:
             async with self.session.get(DEFAULT_STEVE_SKIN_URL, headers=headers) as res:
                 data = await res.read()
 
-                self.cache.set(
-                    cache_key,
-                    "skin_model_fallback",
-                    list(data),
-                    ttl=3600,
-                )
-
+                self.cache.set(cache_key, list(data), ttl=3600)
                 return data
-
-
-cache = MySQLCache(default_ttl=300)
-API = VoxylAPI(cache=cache)
-SKINS_API = SkinAPI(cache=cache)
