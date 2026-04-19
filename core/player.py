@@ -115,3 +115,24 @@ async def fetch_player(
             content="The API is currently down. If this issue persists, please contact the **VoxStats Dev Team**."
         )
         return None
+
+
+async def fetch_player_web(player: str):
+    try:
+        if not player or len(player) > 16:
+            return None
+
+        uuid = mcfetch.Player(
+            player=player,
+            requests_obj=mojang_session,
+        ).uuid
+
+        if not uuid:
+            return None
+
+        player_obj = await PlayerInfo.fetch(uuid)
+
+        return uuid, player_obj
+
+    except Exception:
+        return None
