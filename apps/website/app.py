@@ -11,10 +11,13 @@ from flask import (
     jsonify,
     request,
 )
+from mcfetch import Player
+
 from .config import Config
 from core import fetch_player_web
 from core.api import SKINS_API
 from core.stats import StatsRenderer
+from core import mojang_session
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -84,6 +87,7 @@ async def handle_player(ign):
         return None
 
     uuid, player_obj = result
+    ign = Player(player=uuid, requests_obj=mojang_session).name
     skin_bytes = await SKINS_API.fetch_skin_model(uuid)
 
     renderer = StatsRenderer(

@@ -12,3 +12,4 @@ aiosqlite
 cachetools
 cachetools_async
 redis
+flask
