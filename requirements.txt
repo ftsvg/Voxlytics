@@ -13,3 +13,4 @@ cachetools
 cachetools_async
 redis
 flask
+quart
