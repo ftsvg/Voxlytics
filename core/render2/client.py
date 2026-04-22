@@ -1,77 +1,85 @@
 import os
 import json
 import hashlib
+from typing import Hashable, Sequence
 from abc import ABC, abstractmethod
 from io import BytesIO
 
 from dotenv import load_dotenv
 
-from aiohttp import ClientSession, ClientTimeout, FormData
+import cachetools.keys
+from aiohttp import ClientSession, ClientTimeout
 from cachetools import TTLCache
 from cachetools_async import cached
 
+from core import logger
 from .placeholders import PlaceholderValues
+from .background import load_background_for_user
 
 load_dotenv()
 
 
-_cache = TTLCache(maxsize=128, ttl=300)
+def exclude_self_key(*args: Sequence[Hashable], **kwargs: frozenset[Hashable]):
+    return cachetools.keys.hashkey(*args[1:], **kwargs)
+
 
 class RenderingClient(ABC):
     def __init__(self, route: str) -> None:
-        self._route = route
+        self._route = route.removeprefix("/")
 
-    async def _make_request(self, formdata: FormData) -> bytes:
+    @staticmethod
+    def bg(
+        discord_id: int,
+    ) -> bytes | None:
+        return load_background_for_user(discord_id)
+
+
+    async def _make_request(
+        self, placeholder_values: PlaceholderValues, background_image: bytes | None
+    ) -> bytes:
+        formdata = placeholder_values.build_form_data(background_image)
+
         async with ClientSession(timeout=ClientTimeout(total=10)) as session:
             res = await session.post(
-                f"{os.environ.get('RENDERER_HOSTNAME')}{self._route}",
-                data=formdata,
+                f"{os.getenv('RENDERER_HOSTNAME')}/{self._route}", data=formdata
             )
             res.raise_for_status()
-            return await res.content.read()
+
+            render_bytes = await res.content.read()
+
+        return render_bytes
 
 
-    async def _make_request_cached(self, cache_key: str, payload: str) -> bytes:
-        if cache_key in _cache:
-            return _cache[cache_key]
+    @cached(cache=TTLCache(ttl=600, maxsize=20), key=exclude_self_key)
+    async def _make_request_with_cache(
+        self, placeholder_values: PlaceholderValues, background_image: bytes | None
+    ) -> bytes:
+        logger.debug("LRU renderer cache miss.")
+        return await self._make_request(placeholder_values, background_image)
 
-        form = FormData()
-        form.add_field(
-            "placeholder_values",
-            payload.encode("utf-8"),
-            filename="blob",
-            content_type="application/json",
+
+    async def render(
+        self,
+        background_image: bytes | None = None,
+        bypass_cache: bool = False
+    ) -> bytes:
+        if bypass_cache:
+            return await self._make_request(self.placeholder_values(), background_image)
+
+        return await self._make_request_with_cache(
+            self.placeholder_values(), background_image
         )
 
-        result = await self._make_request(form)
-        _cache[cache_key] = result
-        return result
 
+    async def render_to_buffer(
+        self, background_image: bytes | None = None, bypass_cache: bool = False
+    ) -> BytesIO:
+        render = await self.render(background_image, bypass_cache)
 
-    async def render(self, bypass_cache: bool = False) -> bytes:
-        values = self.placeholder_values()
-        payload = json.dumps(values.as_dict(), separators=(",", ":"), sort_keys=True)
+        img_bytes = BytesIO(render)
+        _ = img_bytes.seek(0)
 
-        cache_key = hashlib.sha256(payload.encode("utf-8")).hexdigest()
-
-        if bypass_cache:
-            form = FormData()
-            form.add_field(
-                "placeholder_values",
-                payload.encode("utf-8"),
-                filename="blob",
-                content_type="application/json",
-            )
-            return await self._make_request(form)
-
-        return await self._make_request_cached(cache_key, payload)
-
-
-    async def render_to_buffer(self, bypass_cache: bool = False) -> BytesIO:
-        render = await self.render(bypass_cache)
-        buf = BytesIO(render)
-        buf.seek(0)
-        return buf
+        return img_bytes
 
 
     @abstractmethod

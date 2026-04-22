@@ -122,7 +122,9 @@ class Session(commands.Cog):
                 session_stats,
             )
 
-            img_bytes = await renderer.render_to_buffer()
+            background_img = renderer.bg(interaction.user.id)
+            img_bytes = await renderer.render_to_buffer(background_img)
+            
             start_time = session.start_time
 
             await interaction.edit_original_response(

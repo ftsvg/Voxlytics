@@ -57,7 +57,8 @@ class Leaderboard(commands.Cog):
             page=page,
         )
 
-        img_bytes = await renderer.render_to_buffer()
+        background_img = renderer.bg(interaction.user.id)
+        img_bytes = await renderer.render_to_buffer(background_img)
 
         view = LeaderboardView(
             data=data,

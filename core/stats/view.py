@@ -88,10 +88,11 @@ class StatsView(discord.ui.View):
             view=self.view_type,
         )
 
-        buffer = await renderer.render_to_buffer()
+        background_img = renderer.bg(interaction.user.id)
+        img_bytes = await renderer.render_to_buffer(background_img)
 
         await interaction.edit_original_response(
-            attachments=[File(buffer, filename=f"stats_{self.mode}.png")],
+            attachments=[File(img_bytes, filename=f"stats_{self.mode}.png")],
             view=self,
         )
 

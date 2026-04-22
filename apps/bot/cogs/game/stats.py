@@ -57,7 +57,8 @@ class Stats(commands.Cog):
                 view="combined"
             )
 
-            img_bytes = await renderer.render_to_buffer()
+            background_img = renderer.bg(interaction.user.id)
+            img_bytes = await renderer.render_to_buffer(background_img)
 
             view = StatsView(
                 interaction=interaction,

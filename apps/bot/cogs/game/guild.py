@@ -112,7 +112,8 @@ class Guild(commands.Cog):
                 position=pos_text,
             )
 
-            img_bytes = await renderer.render_to_buffer()
+            background_img = renderer.bg(interaction.user.id)
+            img_bytes = await renderer.render_to_buffer(background_img)
 
             await interaction.edit_original_response(
                 attachments=[File(img_bytes, filename="guild_info.png")]

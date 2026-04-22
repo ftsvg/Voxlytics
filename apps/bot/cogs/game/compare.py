@@ -178,7 +178,9 @@ class Compare(commands.Cog):
             )
 
             renderer = CompareStatsRenderer(player_1, player_2)
-            img_bytes = await renderer.render_to_buffer()
+            
+            background_img = renderer.bg(interaction.user.id)
+            img_bytes = await renderer.render_to_buffer(background_img)
 
             await interaction.edit_original_response(
                 attachments=[File(img_bytes, filename="compare.png")]

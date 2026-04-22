@@ -1,5 +1,6 @@
 import json
 import typing
+from typing_extensions import override
 from collections.abc import Mapping
 from base64 import b64encode
 from dataclasses import dataclass
@@ -124,6 +125,7 @@ class PlaceholderValues:
             TSpan(value=span.value, fill=span.fill) for span in spans
         ]
 
+
     def ad_displayname_star(
         self,
         name: str,
@@ -144,14 +146,41 @@ class PlaceholderValues:
         self.text[f"{placeholder_key}#text"] = spans
 
 
-    def build_form_data(self) -> aiohttp.FormData:
+    def build_form_data(
+        self, background_image: bytes | None
+    ) -> aiohttp.FormData:
         data = aiohttp.FormData()
-        payload = json.dumps(self.as_dict(), separators=(",", ":"))
+        data.add_field("scale", "regular")
         data.add_field(
             "placeholder_values",
-            payload.encode("utf-8"),
+            json.dumps(self.as_dict()).encode("utf-8"),
             filename="blob",
             content_type="application/json",
         )
+
+        if background_image is not None:
+            data.add_field(
+                "background_image",
+                background_image,
+                filename="blob",
+                content_type="image/png",
+            )
+
         return data
 
+
+    @override
+    def __hash__(self) -> int:
+        hashable_text: list[tuple[str, typing.Any]] = []
+
+        for k, v in self.text.items():
+            if isinstance(v, list):
+                hashable_text.append((k, tuple(v)))
+            else:
+                hashable_text.append((k, v))
+
+        return hash((
+            frozenset(self.images.items()),
+            frozenset(self.shapes.items()),
+            frozenset(hashable_text),
+        ))

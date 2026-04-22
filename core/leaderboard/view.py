@@ -74,12 +74,13 @@ class LeaderboardView(discord.ui.View):
             page=self.page,
         )
 
-        img = await renderer.render_to_buffer()
+        background_img = renderer.bg(interaction.user.id)
+        img_bytes = await renderer.render_to_buffer(background_img)
 
         self._build()
 
         await interaction.edit_original_response(
-            attachments=[File(img, filename="leaderboard.png")],
+            attachments=[File(img_bytes, filename="leaderboard.png")],
             view=self,
         )
 

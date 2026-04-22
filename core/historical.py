@@ -110,7 +110,8 @@ async def historical_interaction(
             period
         )
 
-        img_bytes = await renderer.render_to_buffer()
+        background_img = renderer.bg(interaction.user.id)
+        img_bytes = await renderer.render_to_buffer(background_img)
         
         reset = historical_data.last_reset
         next_reset = reset + PERIOD_SECONDS[period]
