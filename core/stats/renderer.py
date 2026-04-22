@@ -18,7 +18,6 @@ class StatsRenderer(RenderingClient):
         player: PlayerInfo,
         mode: str,
         view: str,
-        discord_id: int | None = None
     ):
         self.schema = MODE_SCHEMAS[mode]
 
@@ -30,7 +29,6 @@ class StatsRenderer(RenderingClient):
         self.player = player
         self.mode = mode
         self.view = view
-        self.discord_id = discord_id
 
         if mode == "Overall":
             self.stats = {

@@ -98,8 +98,9 @@ async def handle_player(ign):
         mode="Overall",
         view="Overall",
     )
+    background_img = renderer.bg(os.getenv("DEVELOPER_ID"))
+    return await renderer.render(background_img)
 
-    return await renderer.render()
 
 @app.route("/api/player")
 def api_player():
