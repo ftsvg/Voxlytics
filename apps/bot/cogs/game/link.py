@@ -4,6 +4,7 @@ from mcfetch import Player
 
 from core import check_if_valid_ign, interaction_check, mojang_session, logger
 from core.database.handlers import UserHandler
+from core.api.helpers import IntegrationInfo
 
 
 class Linking(commands.Cog):
@@ -35,11 +36,43 @@ class Linking(commands.Cog):
                 return None
             
             handler = UserHandler(interaction.user.id)
+            user = handler.get_player()
+
+            if user and user.discord_id:
+                ign = Player(player=user.uuid, requests_obj=mojang_session).name
+                return await interaction.edit_original_response(
+                    content=f"You are already linked as **{ign}**. Want to unlink? Run **/unlink**"
+                )
+            
+            integration = await IntegrationInfo.fetch(
+                uuid=uuid, discord_id=interaction.user.id
+            )
+
+            if not isinstance(integration.discord_from_player, dict) \
+            or not isinstance(integration.player_from_discord, dict):
+                content = (
+                    f"Player Not Integrated To Voxyl Network!\n"
+                    "- To successfully link your account, please ensure that "
+                    "you're using the correct IGN and Discord account that is integrated to the Voxyl Network.\n"
+                    "- Join the [Official Bedwarspractice Discord](<https://discord.gg/7Mt7T8hqr4>) and go into the integration channel."
+                )
+
+                return await interaction.edit_original_response(
+                    content=content
+                )
+            
+            if interaction.user.id != integration.discord_id:
+                ign = Player(player=integration.player_uuid, requests_obj=mojang_session).name
+
+                return await interaction.edit_original_response(
+                    content=f"You are integrated to **{ign}**. Run **/link {ign}** to link your account."
+                )
+            
+            ign = Player(player=integration.player_uuid, requests_obj=mojang_session).name
+
             handler.link_player(uuid)
 
-            ign = Player(player=uuid, requests_obj=mojang_session).name
-
-            await interaction.edit_original_response(
+            return await interaction.edit_original_response(
                 content=f"You have successfully linked as **{ign}**."
             )
 
