@@ -46,3 +46,14 @@ class LeaderboardSnapshot:
     type: str
     data: dict[str, Any]
     updated_at: int
+
+
+@dataclass(slots=True)
+class Milestone:
+    id: int
+    discord_id: int
+    uuid: str
+    type: str
+    value: int
+    threshold: int
+    notified: bool

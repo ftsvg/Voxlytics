@@ -86,7 +86,7 @@ class Backgrounds(commands.Cog):
     ):
         await interaction.response.defer()
         try:
-            result = await interaction_check(interaction.user.id, 'background_set')
+            result = await interaction_check(interaction.user.id, 'background_request')
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
