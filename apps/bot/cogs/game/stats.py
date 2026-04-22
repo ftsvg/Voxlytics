@@ -1,5 +1,3 @@
-from typing import final, override
-
 import mcfetch
 from discord.ext import commands
 from discord import app_commands, Interaction, File
