@@ -39,6 +39,10 @@ class Linking(commands.Cog):
             user = handler.get_player()
 
             if user and user.discord_id:
+                if not user.uuid:
+                    return await interaction.edit_original_response(
+                        content="You have invalid data linked. Please unlink and relink."
+                    )
                 ign = Player(player=user.uuid, requests_obj=mojang_session).name
                 return await interaction.edit_original_response(
                     content=f"You are already linked as **{ign}**. Want to unlink? Run **/unlink**"
@@ -65,12 +69,30 @@ class Linking(commands.Cog):
                 )
             
             if interaction.user.id != integration.discord_id:
+                if not integration.player_uuid:
+                    content = (
+                        f"Player Not Integrated To Voxyl Network!\n"
+                        "- To successfully link your account, please ensure that "
+                        "you're using the correct IGN and Discord account that is integrated to the Voxyl Network.\n"
+                        "- Join the [Official Bedwarspractice Discord](<https://discord.gg/7Mt7T8hqr4>) and go into the integration channel."
+                    )
+                    return await interaction.edit_original_response(content=content)
+
                 ign = Player(player=integration.player_uuid, requests_obj=mojang_session).name
 
                 return await interaction.edit_original_response(
                     content=f"You are integrated to **{ign}**. Run **/link {ign}** to link your account."
                 )
             
+            if not integration.player_uuid:
+                content = (
+                    f"Player Not Integrated To Voxyl Network!\n"
+                    "- To successfully link your account, please ensure that "
+                    "you're using the correct IGN and Discord account that is integrated to the Voxyl Network.\n"
+                    "- Join the [Official Bedwarspractice Discord](<https://discord.gg/7Mt7T8hqr4>) and go into the integration channel."
+                )
+                return await interaction.edit_original_response(content=content)
+
             ign = Player(player=integration.player_uuid, requests_obj=mojang_session).name
 
             handler.link_player(uuid)
