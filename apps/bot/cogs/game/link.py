@@ -48,8 +48,11 @@ class Linking(commands.Cog):
                 uuid=uuid, discord_id=interaction.user.id
             )
 
-            if not isinstance(integration.discord_from_player, dict) \
-            or not isinstance(integration.player_from_discord, dict):
+            if (
+                not isinstance(integration.discord_from_player, dict)
+                or not isinstance(integration.player_from_discord, dict)
+                or not integration.player_uuid
+            ):
                 content = (
                     f"Player Not Integrated To Voxyl Network!\n"
                     "- To successfully link your account, please ensure that "
