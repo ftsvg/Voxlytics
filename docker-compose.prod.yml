@@ -19,6 +19,8 @@ services:
     restart: unless-stopped
 
   web:
+    ports:
+      - "5000:5000" 
     restart: unless-stopped
 
   renderer:
