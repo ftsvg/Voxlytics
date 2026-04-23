@@ -208,3 +208,6 @@ __marimo__/
 
 schema.sql
 info.md
+
+.env.prod 
+.env.dev 

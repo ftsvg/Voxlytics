@@ -1,0 +1,16 @@
+services:
+  web:
+    ports:
+      - "5000:5000"
+
+  renderer:
+    ports:
+      - "3001:3001"
+
+  db:
+    ports:
+      - "3307:3306"
+
+  redis:
+    ports:
+      - "6379:6379"
