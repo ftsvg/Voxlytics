@@ -20,20 +20,22 @@ class SessionHandler:
 
     @ensure_cursor
     def update_session(self, player_data: PlayerInfo, *, cursor: Cursor = None) -> None:
+        now = int(time.time())
+        
         cursor.execute(
             """
             INSERT INTO sessions (
                 uuid, wins, weighted, kills, finals, beds, star, xp, start_time
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE
-                wins=VALUES(wins),
-                weighted=VALUES(weighted),
-                kills=VALUES(kills),
-                finals=VALUES(finals),
-                beds=VALUES(beds),
-                star=VALUES(star),
-                xp=VALUES(xp),
-                start_time=VALUES(start_time)
+                wins = %s,
+                weighted = %s,
+                kills = %s,
+                finals = %s,
+                beds = %s,
+                star = %s,
+                xp = %s,
+                start_time = %s
             """,
             (
                 self._uuid,
@@ -44,6 +46,16 @@ class SessionHandler:
                 player_data.beds,
                 player_data.level,
                 player_data.exp,
-                int(time.time())
+                now,
+
+                # Duplicate data
+                player_data.wins,
+                player_data.weightedwins,
+                player_data.kills,
+                player_data.finals,
+                player_data.beds,
+                player_data.level,
+                player_data.exp,
+                now
             )
         )

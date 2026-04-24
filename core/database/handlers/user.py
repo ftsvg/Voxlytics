@@ -12,9 +12,9 @@ class UserHandler:
             INSERT INTO users (discord_id, uuid)
             VALUES (%s, %s)
             ON DUPLICATE KEY UPDATE 
-                uuid = VALUES(uuid);
+                uuid = %s;
             """,
-            (self._discord_id, uuid,)
+            (self._discord_id, uuid, uuid,)
         )
 
 

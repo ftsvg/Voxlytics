@@ -49,9 +49,10 @@ class Account:
             """
             INSERT INTO accounts (discord_id, created_at, blacklisted)
             VALUES (%s, %s, %s)
-            ON DUPLICATE KEY UPDATE blacklisted = VALUES(blacklisted)
+            ON DUPLICATE KEY UPDATE 
+                blacklisted = %s
             """,
-            (self._discord_id, int(time.time()), blacklisted)
+            (self._discord_id, int(time.time()), blacklisted, blacklisted,)
         )
 
 

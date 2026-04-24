@@ -49,6 +49,21 @@ def get_xp_and_stars(
     return xp_gained, stars_gained
 
 
+def get_stars_gained(
+    old_level: int,
+    old_xp: int,
+    new_level: int,
+    new_xp: int
+) -> float:
+    old_total_xp = get_total_xp(old_level, old_xp)
+    new_total_xp = get_total_xp(new_level, new_xp)
+
+    xp_gained = new_total_xp - old_total_xp
+    stars_gained = round(xp_gained / 5000, 2)
+
+    return stars_gained
+
+
 def fmt(value, color="&f") -> str:
     return f"{color}{value:,}"
 

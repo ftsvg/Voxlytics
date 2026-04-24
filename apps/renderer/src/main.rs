@@ -56,6 +56,10 @@ async fn main() {
             schema::load_schema_from_file("./templates/guild_info/schema.json")
                 .unwrap(),
             "/guild",
+        ).add_renderer(
+            schema::load_schema_from_file("./templates/check/schema.json")
+                .unwrap(),
+            "/check",
         );
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3001")

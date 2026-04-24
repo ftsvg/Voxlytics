@@ -34,9 +34,9 @@ class LeaderboardHandler:
             INSERT INTO leaderboard_channels (guild_id, channel_id)
             VALUES (%s, %s)
             ON DUPLICATE KEY UPDATE
-                channel_id=VALUES(channel_id)
+                channel_id=%s
             """,
-            (guild_id, channel_id),
+            (guild_id, channel_id, channel_id,)
         )
 
 
@@ -47,11 +47,15 @@ class LeaderboardHandler:
             INSERT INTO leaderboard_snapshot (type, data, updated_at)
             VALUES (%s, %s, %s)
             ON DUPLICATE KEY UPDATE
-                data=VALUES(data),
-                updated_at=VALUES(updated_at)
+                data=%s,
+                updated_at=%s
             """,
             (
                 self._type,
+                json.dumps(data),
+                int(time.time()),
+
+                # Duplicate data
                 json.dumps(data),
                 int(time.time()),
             ),

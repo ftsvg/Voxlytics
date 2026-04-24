@@ -24,11 +24,22 @@ class MilestoneHandler:
             INSERT INTO milestones (discord_id, uuid, type, value, threshold)
             VALUES (%s, %s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE
-                value=VALUES(value),
-                threshold=VALUES(threshold),
-                notified=FALSE;
+                value=%s,
+                threshold=%s,
+                notified=%s;
             """,
-            (self._discord_id, self._uuid, type, value, threshold)
+            (
+                self._discord_id,
+                self._uuid,
+                type,
+                value,
+                threshold,
+
+                # Duplicate data
+                value,
+                threshold,
+                False,
+            )
         )
 
     
