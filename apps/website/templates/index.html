@@ -3,138 +3,82 @@
 {% from "components/footer.html" import render_footer %}
 
 {% block head %}
-<title>Voxyltics</title>
+<title>Voxlytics</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
-<link rel="icon" type="image/png" href="{{url_for('static', filename='images/logo_small.png')}}">
-
-<meta property="og:title" content="Voxlytics">
-<meta property="og:description" content="The #1 Discord stats bot to view stats from any game on the Voxyl Network.">
-<meta property="og:image" content="https://voxlytics.net/static/images/logo_big.png">
-<meta name="theme-color" content="#5555FF">
-<meta property="og:type" content="website">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/features.css') }}">
 {% endblock %}
 
 {% block body %}
 {{ render_header() }}
 
-<main class="hero">
+<section class="hero">
     <div class="hero-content">
         <h1>Voxlytics</h1>
         <p>The #1 Discord stats bot to view stats from any game on the Voxyl Network.</p>
-        <div class="btns">
-            <a href="{{url_for('invite')}}" class="btn btn-primary discord"><iconify-icon
-                    icon="ic:baseline-discord"></iconify-icon> Try on Discord</a>
-            <a href="{{url_for('discord')}}" class="btn btn-outline join">Join Discord</a>
+    </div>
+    <div class="hero-btns">
+        <a href="{{url_for('invite')}}" target="_blank" class="btn btn-invite"><iconify-icon icon="ic:baseline-discord"></iconify-icon> Try
+            on Discord</a>
+        <a href="{{url_for('discord')}}" target="_blank" class="btn btn btn-support"><iconify-icon
+                icon="lucide:square-arrow-out-up-right"></iconify-icon> Get Support</a>
+    </div>
+    <div class="player-search">
+        <input type="text" placeholder="Search for a player..." class="player-input">
+        <button type="submit" class="btn-search"><iconify-icon icon="lucide:search"></iconify-icon></button>
+    </div>
+</section>
+<section class="trusted-section">
+    <h1 class="trusted-heading">Trusted By</h1>
+    <div class="stat-cards">
+        <div class="card">
+            <p class="type">Servers</p>
+            <h2 class="stat">14</h2>
+        </div>
+        <div class="card">
+            <p class="type">Users</p>
+            <h2 class="stat">184</h2>
+        </div>
+        <div class="card">
+            <p class="type">Commands Ran</p>
+            <h2 class="stat">10,000+</h2>
         </div>
     </div>
-</main>
-<section class="search-section">
-    <div class="search-wrapper">
-        <h1 class="search-title">Search Player</h1>
-        <div class="search-box">
-            <input type="text" id="ignInput" placeholder="Enter Minecraft username...">
-            <button id="searchBtn" class="search-btn">Search</button>
+</section>
+
+<section class="feature-section">
+    <div class="feature-scroll">
+        <div class="feature-sticky">
+            <div class="feature-content">
+
+                <div class="feature-text">
+                    <small id="feature-small">Feature 01</small>
+                    <h1 id="feature-title">Players</h1>
+                    <p id="feature-desc">
+                        Voxlytics provides beautiful stat profiles for all players on the Voxyl Network.
+                        Use <span class="command">/stats [player] [mode]</span> to view detailed in-game statistics.
+                        Link your account with <span class="command">/link [player]</span> to make running commands
+                        faster and easier.
+                    </p>
+                </div>
+
+                <div class="feature-image">
+                    <img id="feature-img" src="{{ url_for('static', filename='images/player.png') }}">
+                </div>
+
+            </div>
         </div>
-        <p id="errorMsg"></p>
-        <div id="loader" class="skeleton" style="display:none;"></div>
-        <div id="result">
-            <img id="resultImage" />
-        </div>
-    </div>
-</section>
-<section class="section">
-    <div class="info">
-        <h1 class="info-title">Players</h1>
-        <p class="info-description">
-            Voxlytics provides beautiful stat profiles for all players on the Voxyl Network. Use <span
-                class="command">/stats [player] [mode]</span> to view detailed in-game statistics.
-            Link your account with <span class="command">/link [player]</span> to make running commands faster and
-            easier.
-        </p>
-    </div>
-    <div class="showcase">
-        <img src="{{url_for('static', filename='images/player.png')}}" alt="Players Image">
-    </div>
-</section>
-
-<section class="section">
-    <div class="showcase">
-        <img src="{{url_for('static', filename='images/leaderboard.png')}}" alt="Leaderboards Image">
-    </div>
-    <div class="info">
-        <h1 class="info-title">Leaderboards</h1>
-        <p class="info-description">
-            Voxlytics lets you explore competitive leaderboards across the Voxyl Network. Use
-            <span class="command">/leaderboard level [page]</span> or
-            <span class="command">/leaderboard weightedwins [page]</span> to browse rankings.
-        </p>
-    </div>
-</section>
-
-<section class="section">
-    <div class="info">
-        <h1 class="info-title">Historical</h1>
-        <p class="info-description">
-            Voxlytics includes historical tracking, allowing you to view player progress over time. Use
-            <span class="command">/historical daily [player]</span>,
-            <span class="command">/historical weekly [player]</span>,
-            <span class="command">/historical monthly [player]</span>, or
-            <span class="command">/historical yearly [player]</span> to track stats across different time periods.
-            You can reset your historical data with <span class="command">/historical reset</span>.
-        </p>
-    </div>
-    <div class="showcase">
-        <img src="{{url_for('static', filename='images/historical.png')}}" alt="Historical Image">
-    </div>
-</section>
-
-<section class="section">
-    <div class="showcase">
-        <img src="{{url_for('static', filename='images/session.png')}}" alt="Sessions Image">
-    </div>
-    <div class="info">
-        <h1 class="info-title">Sessions</h1>
-        <p class="info-description">
-            Voxlytics sessions let you track your progress in real time across play sessions. Each user can have only one active session, and you must be linked to create or view session data. Use
-            <span class="command">/session view</span> to see your current session stats, or
-            <span class="command">/session reset</span> to clear your session and start fresh.
-        </p>
-    </div>
-</section>
-
-<section class="section">
-    <div class="info">
-        <h1 class="info-title">Projected</h1>
-        <p class="info-description">
-            Voxlytics Prestige allows you to project a player's future stats based on their session stats. Use
-            <span class="command">/prestige [level] [player]</span> to calculate estimated progression and stat outcomes
-            from an active session. Please note that a session must be started first using
-            <span class="command">/session start [session]</span> before prestige data can be generated.
-        </p>
-    </div>
-    <div class="showcase">
-        <img src="{{url_for('static', filename='images/projected.png')}}" alt="Historical Image">
-    </div>
-</section>
-
-<section class="section">
-    <div class="showcase">
-        <img src="{{url_for('static', filename='images/compare.png')}}" alt="Compare Image">
-    </div>
-    <div class="info">
-        <h1 class="info-title">Compare</h1>
-        <p class="info-description">
-            Voxlytics lets you compare player stats side by side to see who comes out on top. Use 
-            <span class="command">/compare [player_1] [player_2]</span> to instantly view a detailed comparison of their stats.
-        </p>
     </div>
 </section>
 
 <section class="invite">
     <h1 class="invite-heading">What are you waiting for?</h1>
-    <p class="invite-description">Invite Voxlytics today to enhance your Voxyl Network experience!</p>
-    <a href="{{url_for('invite')}}" class="btn btn-primary discord"><iconify-icon
-            icon="ic:baseline-discord"></iconify-icon>Try on Discord</a>
+    <p class="invite-description">
+        Invite Voxlytics today to enhance your Voxyl Network experience!
+    </p>
+    <a href="{{url_for('invite')}}" class="btn btn-invite">
+        <iconify-icon icon="ic:baseline-discord"></iconify-icon>
+        Try on Discord
+    </a>
 </section>
 
 {{ render_footer() }}
