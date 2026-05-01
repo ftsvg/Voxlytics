@@ -16,3 +16,4 @@ flask
 quart
 cryptography
 matplotlib
+uvicorn[standard]
