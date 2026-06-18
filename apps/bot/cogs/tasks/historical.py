@@ -1,54 +1,71 @@
-import time
-from discord.ext import commands, tasks
+import asyncio
 
-from core.database.handlers import HistoricalHandler
+from datetime import datetime, date
+from discord.ext import tasks, commands
+
+from core import logger
 from core.api.helpers import PlayerInfo
-from core import logger, PERIOD_SECONDS
+from core.database.handlers import HistoricalSnapshotHandler
 
 
-class HistoricalResetTask(commands.Cog):
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
-        self.reset_loop.start()
+class SnapshotTask(commands.Cog):
+    def __init__(self, client: commands.Bot):
+        self.client = client
+        self.snapshot_loop.start()
 
-    @tasks.loop(minutes=15)
-    async def reset_loop(self):
+    @tasks.loop(hours=24)
+    async def snapshot_loop(self):
         try:
-            now = int(time.time())
+            uuids = HistoricalSnapshotHandler(None).get_all_players()
 
-            handler = HistoricalHandler()
-            rows = handler.get_tacked_players()
+            logger.info(
+                f"Creating snapshots for {len(uuids)} players."
+            )
 
-            for uuid, period, last_reset in rows:
-                interval = PERIOD_SECONDS.get(period)
-
-                if not interval:
-                    continue
-
+            for uuid in uuids:
                 try:
-                    last_reset = int(last_reset or 0)
+                    player_data = await PlayerInfo.fetch(uuid)
 
-                except (TypeError, ValueError):
-                    last_reset = 0
+                    if not player_data:
+                        continue
 
-                next_reset = last_reset + interval
-                if now < next_reset:
-                    continue
+                    HistoricalSnapshotHandler(
+                        uuid
+                    ).create_snapshot(player_data)
 
-                player_data = await PlayerInfo.fetch(uuid)
-                if not player_data:
-                    continue
-
-                HistoricalHandler(uuid, period).update_historical(player_data)
+                except Exception:
+                    logger.exception(
+                        f"Failed snapshot for {uuid}"
+                    )
 
         except Exception:
-            logger.exception("Unhandled exception in Historical reset task")
+            logger.exception(
+                "Unhandled exception in snapshot loop."
+            )
+
+    @snapshot_loop.before_loop
+    async def before_loop(self):
+        await self.client.wait_until_ready()
+
+        now = datetime.now()
+
+        midnight = datetime.combine(
+            date.today(),
+            datetime.min.time()
+        )
+
+        seconds_until_next_midnight = (
+            midnight.timestamp()
+            + 86400
+            - now.timestamp()
+        )
+
+        await asyncio.sleep(
+            seconds_until_next_midnight
+        )
 
 
-    @reset_loop.before_loop
-    async def before_reset_loop(self):
-        await self.bot.wait_until_ready()
-
-
-async def setup(bot: commands.Bot):
-    await bot.add_cog(HistoricalResetTask(bot))
+async def setup(client: commands.Bot):
+    await client.add_cog(
+        SnapshotTask(client)
+    )

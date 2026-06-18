@@ -1,19 +1,16 @@
 from core import get_xp_and_stars
-from core.database import Historical
 from core.api.helpers import PlayerInfo
+from core.database.handlers import HistoricalSnapshot
 
 
 class HistoricalStats:
     def __init__(
-        self, 
-        historical_data: Historical, 
+        self,
+        snapshot: HistoricalSnapshot,
         player_data: PlayerInfo
     ):
-        self._historical_data = historical_data
-        self._player_data = player_data
-
-        p = self._player_data
-        s = self._historical_data
+        p = player_data
+        s = snapshot
 
         self.wins = int(p.wins) - int(s.wins)
         self.weighted = int(p.weightedwins) - int(s.weighted)
@@ -28,4 +25,4 @@ class HistoricalStats:
             new_xp=int(p.exp)
         )
 
-        self.last_reset = s.last_reset
+        self.snapshot_date = s.snapshot_date

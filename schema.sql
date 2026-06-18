@@ -15,9 +15,10 @@ CREATE TABLE sessions (
     start_time INT NOT NULL
 );
 
-CREATE TABLE historical (
+CREATE TABLE historical_snapshots (
     uuid VARCHAR(36) NOT NULL,
-    period ENUM('daily', 'weekly', 'monthly', 'yearly') NOT NULL,
+    snapshot_date DATE NOT NULL,
+
     wins INT NOT NULL,
     weighted INT NOT NULL,
     kills INT NOT NULL,
@@ -25,8 +26,13 @@ CREATE TABLE historical (
     beds INT NOT NULL,
     star INT NOT NULL,
     xp BIGINT NOT NULL,
-    last_reset INT UNSIGNED NOT NULL,
-    PRIMARY KEY (uuid, period)
+
+    PRIMARY KEY (uuid, snapshot_date)
+);
+
+CREATE TABLE historical_players (
+    uuid VARCHAR(36) PRIMARY KEY,
+    tracked_since DATE NOT NULL
 );
 
 CREATE TABLE leaderboard_snapshot (
@@ -66,7 +72,7 @@ CREATE TABLE milestones (
 CREATE TABLE server_config (
     server_id BIGINT PRIMARY KEY,
     chart_logs BIGINT NOT NULL,
-    max_guilds INT NOT NULL DEFAULT 25
+    max_guilds INT NOT NULL DEFAULT 1
 );
 
 CREATE TABLE tracked_server_guilds (

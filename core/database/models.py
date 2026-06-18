@@ -22,20 +22,6 @@ class Session:
 
 
 @dataclass(slots=True)
-class Historical:
-    uuid: str
-    period: str
-    wins: str
-    weighted: str
-    kills: int
-    finals: int
-    beds: int
-    star: int
-    xp: int
-    last_reset: int
-
-
-@dataclass(slots=True)
 class LeaderboardChannel:
     guild_id: int
     channel_id: int

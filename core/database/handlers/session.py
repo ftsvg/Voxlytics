@@ -1,6 +1,6 @@
 import time
 
-from core.database import ensure_cursor, async_ensure_cursor, Cursor, Session
+from core.database import ensure_cursor, Cursor, Session
 from core.api.helpers import PlayerInfo
 
 

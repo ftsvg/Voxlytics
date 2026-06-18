@@ -1,5 +1,4 @@
-from datetime import datetime, timezone
-from dateutil.relativedelta import relativedelta
+from datetime import date, timedelta
 
 
 def get_xp_for_level(level: int) -> int:
@@ -73,3 +72,40 @@ def ordinal(n: int) -> str:
         return "th"
     
     return {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+
+
+def get_period_dates(period: str):
+    today = date.today()
+
+    if period == "today":
+        return today, None
+
+    if period == "yesterday":
+        return today - timedelta(days=1), today
+
+    if period == "weekly":
+        return today - timedelta(days=7), None
+
+    if period == "last_week":
+        return (
+            today - timedelta(days=14),
+            today - timedelta(days=7)
+        )
+
+    if period == "monthly":
+        return today - timedelta(days=30), None
+
+    if period == "last_month":
+        return (
+            today - timedelta(days=60),
+            today - timedelta(days=30)
+        )
+
+    if period == "yearly":
+        return today - timedelta(days=365), None
+
+    if period == "last_year":
+        return (
+            today - timedelta(days=730),
+            today - timedelta(days=365)
+        )
