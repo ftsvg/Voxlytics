@@ -414,15 +414,38 @@ class GuildHandler:
     ) -> float:
         cursor.execute(
             """
-            SELECT MAX(stars) AS highest
-            FROM player_past_weeks
+            SELECT highest_week
+            FROM tracked_players
             WHERE uuid = %s
             """,
             (uuid,)
         )
 
         row = cursor.fetchone()
-        return float(row["highest"]) if row and row["highest"] is not None else 0.0
+
+        return (
+            float(row["highest_week"])
+            if row and row["highest_week"] is not None
+            else 0.0
+        )
+
+
+    @ensure_cursor
+    def set_player_highest_week(
+        self,
+        uuid: str,
+        highest_week: float,
+        *,
+        cursor: Cursor
+    ):
+        cursor.execute(
+            """
+            UPDATE tracked_players
+            SET highest_week = %s
+            WHERE uuid = %s
+            """,
+            (highest_week, uuid)
+        )
 
 
 class LastWeekHandler:

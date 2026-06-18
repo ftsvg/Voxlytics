@@ -145,6 +145,15 @@ class WeeklyCharts(commands.Cog):
                             )
                         )
 
+                        if gained > player.highest_week:
+                            db_tasks.append(
+                                asyncio.to_thread(
+                                    guild_handler.set_player_highest_week,
+                                    player.uuid,
+                                    gained
+                                )
+                            )
+
                     except Exception:
                         continue
 

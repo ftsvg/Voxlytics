@@ -136,3 +136,77 @@ async def fetch_player_web(player: str):
 
     except Exception:
         return None
+    
+
+async def fetch_player_modal(
+    interaction: Interaction,
+    player: Optional[str],
+) -> Optional[Tuple[str, PlayerInfo]]:
+    try:
+        if not player or not isinstance(player, str):
+            await interaction.followup.send(
+                "Please provide a valid player.",
+                ephemeral=True
+            )
+            return None
+
+        if len(player) > 16:
+            await interaction.followup.send(
+                f"**{player}** does not exist! Please provide a valid player.",
+                ephemeral=True
+            )
+            return None
+
+        try:
+            uuid = mcfetch.Player(
+                player=player,
+                requests_obj=mojang_session,
+            ).uuid
+
+        except Exception:
+            await interaction.followup.send(
+                "Mojang API failed. Please try again.",
+                ephemeral=True
+            )
+            return None
+
+        if not uuid:
+            await interaction.followup.send(
+                f"**{player}** does not exist! Please provide a valid player.",
+                ephemeral=True
+            )
+            return None
+
+        player_obj = await PlayerInfo.fetch(uuid)
+
+        if isinstance(player_obj.player_info, dict) and "error" in player_obj.player_info:
+            err = player_obj.player_info["error"]
+
+            if err == 429:
+                await interaction.followup.send(
+                    "We are being rate limited. Please try again later.",
+                    ephemeral=True
+                )
+                return None
+
+            await interaction.followup.send(
+                "Failed to fetch player data.",
+                ephemeral=True
+            )
+            return None
+
+        if player_obj.last_login_time is None:
+            await interaction.followup.send(
+                "This player has never played on **bedwarspractice.club** before.",
+                ephemeral=True
+            )
+            return None
+
+        return uuid, player_obj
+
+    except Exception:
+        await interaction.followup.send(
+            "The API is currently down. If this issue persists, please contact the **VoxStats Dev Team**.",
+            ephemeral=True
+        )
+        return None
