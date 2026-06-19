@@ -46,7 +46,7 @@ class WeightedWinsLeaderboardUpdates(commands.Cog):
                     requests_obj=mojang_session
                 )
                 name = name.name
-                skin_head = f"https://cravatar.eu/helmavatar/{uuid}/64"
+                skin_head = f"https://nmsr.nickac.dev/face/{uuid}"
 
                 embed = Embed(
                     color=MAIN_COLOR,

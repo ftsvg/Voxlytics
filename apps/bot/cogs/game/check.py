@@ -55,7 +55,7 @@ class CheckModal(Modal, title="Check Player"):
                 player_data.exp
             )
 
-            skin_head_url = f"https://cravatar.eu/helmavatar/{uuid}/64"
+            skin_head_url = f"https://nmsr.nickac.dev/face/{uuid}"
 
             name = mcfetch.Player(
                 player=uuid,
@@ -313,7 +313,7 @@ class Check(commands.Cog):
                 player_data.exp
             )
 
-            skin_head_url = f"https://cravatar.eu/helmavatar/{uuid}/64"
+            skin_head_url = f"https://nmsr.nickac.dev/face/{uuid}"
             
             name = mcfetch.Player(player=uuid, requests_obj=mojang_session).name
 
