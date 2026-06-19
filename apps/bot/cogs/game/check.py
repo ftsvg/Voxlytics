@@ -190,7 +190,8 @@ class CheckComponent(LayoutView):
         self.owner_id = interaction.user.id
         self.uuid = uuid
 
-        avg = round(sum(past_weeks) / len(past_weeks), 2) if past_weeks else 0
+        avg = round(sum(past_weeks) / len(past_weeks), 2) if len(past_weeks) > 0 else 0
+
         weeks = (past_weeks + [0] * 8)[:8]
         row1 = ", ".join(f"`{week:.2f}✫`" for week in weeks[:4])
         row2 = ", ".join(f"`{week:.2f}✫`" for week in weeks[4:])
