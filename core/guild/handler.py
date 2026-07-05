@@ -131,6 +131,25 @@ class ServerConfigHandler:
         rows = cursor.fetchall()
         return [TrackedServerGuilds(**row) for row in rows] if rows else []
 
+    @ensure_cursor
+    def ensure_server_config(
+        self,
+        *,
+        cursor: Cursor = None
+    ):
+        cursor.execute(
+            """
+            INSERT IGNORE INTO server_config (
+                server_id,
+                chart_logs
+            )
+            VALUES (%s, %s)
+            """,
+            (
+                self._server_id, 0
+            )
+        )
+
 
 class GuildHandler:
     def __init__(self, guild_id: int | None = None) -> None:

@@ -1,9 +1,11 @@
 from discord.ext import commands
-from discord import app_commands, Interaction, TextChannel, Embed
+from discord import app_commands, Interaction, TextChannel
 
 from core.api.helpers import GuildInfo
-from core.guild import ServerConfigHandler, GuildHandler, TrackedServerGuilds
-from core import logger, interaction_check, MAIN_COLOR
+from core.guild import ServerConfigHandler, GuildHandler
+from core import logger, interaction_check
+
+from core.guild import TrackerSettingsComponent
 
 
 class GuildTracker(commands.Cog):
@@ -15,17 +17,10 @@ class GuildTracker(commands.Cog):
     )
 
     @tracker.command(
-        name="config",
-        description="Configure this servers tracker settings"
+        name="settings",
+        description="View this server's tracker configuration"
     )
-    @app_commands.describe(
-        charts_channel="The channel where all xp/gxp charts get sent to"
-    )
-    async def config(
-        self,
-        interaction: Interaction,
-        charts_channel: TextChannel
-    ):
+    async def settings(self, interaction: Interaction):
         await interaction.response.defer()
         try:
             result = await interaction_check(interaction.user.id, 'tracker_config')
@@ -41,13 +36,16 @@ class GuildTracker(commands.Cog):
                     )
                 )
             
-            handler = ServerConfigHandler(interaction.guild.id)
-            handler.update_server_config(charts_channel.id)
-            
-            return await interaction.edit_original_response(
-                content="Successfully updated the tracked config."
+            ServerConfigHandler(interaction.guild.id).ensure_server_config()
+
+            view = await TrackerSettingsComponent.create(
+                interaction.guild.id,
+                interaction.user.id
             )
 
+            await interaction.edit_original_response(
+                view=view
+            )
 
         except Exception as error:
             logger.exception(f"Unhandled exception: {error}")
@@ -241,136 +239,6 @@ class GuildTracker(commands.Cog):
                 content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
             )
 
-
-    @tracker.command(
-        name="delete",
-        description="Delete a tracked guild"
-    )
-    @app_commands.describe(tag="The guild you want to delete")
-    async def delete(
-        self,
-        interaction: Interaction,
-        tag: str
-    ):
-        await interaction.response.defer()
-        try:
-            result = await interaction_check(interaction.user.id, 'tracker_config')
-            if result.status == "blacklisted":
-                return await interaction.edit_original_response(
-                    content=result.message
-                )            
-
-            if not interaction.user.guild_permissions.administrator:
-                return await interaction.edit_original_response(
-                    content=(
-                        "You don't have the permissions to execute this command. Please ask a server admin to configure the tracker settings."
-                    )
-                )
-            
-            config_handler = ServerConfigHandler(interaction.guild.id)
-            tracked_guilds = config_handler.get_tracked_server_guilds()
-
-            if not tracked_guilds:
-                return await interaction.edit_original_response(
-                    content="You dont have any guilds currently tracked."
-                )
-            
-            guild_info = await GuildInfo.fetch(tag)
-            if not guild_info:
-                return await interaction.edit_original_response(
-                    content=f"**{tag}** was not found. Please enter a valid guild tag."
-                )
-
-            guild_id = guild_info.id
-            tracked_ids = {g.guild_id for g in tracked_guilds}
-
-            if guild_id not in tracked_ids:
-                return await interaction.edit_original_response(
-                    content="This guild is not currently being tracked"
-                )
-            
-            config_handler.delete_tracked_server_guild(guild_id)
-
-            return await interaction.edit_original_response(
-                content=f"Successfully deleted **{guild_info.name} [{tag.upper()}]** from the tracked."
-            )
-
-        except Exception as error:
-            logger.exception(f"Unhandled exception: {error}")
-
-            await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
-            )
-
-
-    @tracker.command(
-        name="settings",
-        description="View this server's tracker configuration"
-    )
-    async def settings(self, interaction: Interaction):
-        await interaction.response.defer()
-
-        try:
-            config_handler = ServerConfigHandler(interaction.guild.id)
-
-            server_config = config_handler.get_server_config()
-            tracked_guilds = config_handler.get_tracked_server_guilds()
-
-            if not server_config:
-                return await interaction.edit_original_response(
-                    content="You have not configured the tracker yet. Use `/tracker config` first."
-                )
-
-            charts_channel = (
-                f"<#{server_config.chart_logs}>"
-                if server_config.chart_logs
-                else "Not set"
-            )
-
-            embed = Embed(
-                title=f"Tracker Settings for {interaction.guild.name}",
-                description=(
-                    f"> **Max guilds:** `{server_config.max_guilds}`\n"
-                    f"> **Charts channel:** {charts_channel}"
-                ),
-                color=MAIN_COLOR
-            )
-
-            if not tracked_guilds:
-                guilds_text = "Currently no tracked guilds."
-            else:
-                lines = []
-
-                for g in tracked_guilds:
-                    g: TrackedServerGuilds
-
-                    guild_info = await GuildInfo.fetch(g.guild_id)
-                    name = guild_info.name if guild_info else "Unknown"
-
-                    logs = (
-                        f"<#{g.log_channel_id}>"
-                        if g.log_channel_id
-                        else "*No logs channel set yet*"
-                    )
-
-                    lines.append(f"> **{name} ({g.guild_id})** {logs}")
-
-                guilds_text = "\n".join(lines)
-
-            embed.add_field(
-                name="Tracked Guilds",
-                value=guilds_text,
-                inline=False
-            )
-
-            return await interaction.edit_original_response(embed=embed)
-
-        except Exception as error:
-            logger.exception(f"Unhandled exception: {error}")
-
-            await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
-            )
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(GuildTracker(client))
