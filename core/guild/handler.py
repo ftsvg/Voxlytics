@@ -3,7 +3,7 @@ from typing import Optional
 
 from core.api.helpers import PlayerInfo
 from core.database import ensure_cursor, Cursor, async_ensure_cursor
-from .models import *
+from .models import ServerConfig, TrackedServerGuilds, TrackedGuilds, TrackedPlayers, LastWeekUpdates
 from .helpers import get_current_week
 
 

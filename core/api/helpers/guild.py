@@ -40,6 +40,9 @@ class GuildInfo:
         if not isinstance(guild_info, dict) or "error" in guild_info:
             return None
 
+        if not isinstance(guild_members, dict) or "error" in guild_members:
+            return None
+
         return cls(identifier, guild_info, guild_members)
 
     @staticmethod

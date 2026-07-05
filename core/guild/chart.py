@@ -1,5 +1,4 @@
 import io
-from datetime import datetime
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from core.api.helpers import GuildInfo

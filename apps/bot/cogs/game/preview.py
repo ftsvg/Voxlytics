@@ -11,7 +11,6 @@ from core.guild import (
     generate_xp_chart,
     generate_gxp_chart,
     get_current_week,
-    TrackedGuilds,
     TrackedPlayers
 )
 from core.api.helpers import GuildInfo, PlayerInfo

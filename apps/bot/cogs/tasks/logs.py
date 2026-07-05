@@ -121,65 +121,75 @@ class GuildLogs(commands.Cog):
                     continue
 
                 for idx, player_info in enumerate(joined_infos):
-                    if isinstance(player_info, Exception):
-                        continue
-
-                    ign = player_info.last_login_name
-                    if not ign:
-                        continue
-
-                    embed = Embed(color=COLOR_GREEN)
-                    embed.set_author(
-                        name=f"{ign} joined the guild",
-                        icon_url=f"https://cravatar.eu/helmavatar/{joined_uuids[idx]}/64"
+                    ign = (
+                        player_info.last_login_name
+                        if not isinstance(player_info, Exception)
+                        else None
                     )
 
-                    await asyncio.gather(
-                        *(self.safe_send(channel, embed) for channel in channels),
-                        return_exceptions=True
-                    )
-
-                    exists = await asyncio.to_thread(
-                        GuildHandler().get_player,
-                        joined_uuids[idx]
-                    )
-
-                    if exists:
-                        await asyncio.to_thread(
-                            GuildHandler().set_guild,
-                            joined_uuids[idx],
-                            guild.guild_id
+                    if ign:
+                        embed = Embed(color=COLOR_GREEN)
+                        embed.set_author(
+                            name=f"{ign} joined the guild",
+                            icon_url=f"https://cravatar.eu/helmavatar/{joined_uuids[idx]}/64"
                         )
-                    else:
-                        await GuildHandler(guild.guild_id).insert_player(
-                            joined_uuids[idx],
-                            guild.guild_id
+
+                        await asyncio.gather(
+                            *(self.safe_send(channel, embed) for channel in channels),
+                            return_exceptions=True
+                        )
+
+                    try:
+                        exists = await asyncio.to_thread(
+                            GuildHandler().get_player,
+                            joined_uuids[idx]
+                        )
+
+                        if exists:
+                            await asyncio.to_thread(
+                                GuildHandler().set_guild,
+                                joined_uuids[idx],
+                                guild.guild_id
+                            )
+                        else:
+                            await GuildHandler(guild.guild_id).insert_player(
+                                joined_uuids[idx],
+                                guild.guild_id
+                            )
+                    except Exception as error:
+                        logger.exception(
+                            f"Failed to update joined player {joined_uuids[idx]}: {error}"
                         )
 
                 for idx, player_info in enumerate(left_infos):
-                    if isinstance(player_info, Exception):
-                        continue
-
-                    ign = player_info.last_login_name
-                    if not ign:
-                        continue
-
-                    embed = Embed(color=COLOR_RED)
-                    embed.set_author(
-                        name=f"{ign} left (or was kicked) from the guild",
-                        icon_url=f"https://cravatar.eu/helmavatar/{left_uuids[idx]}/64"
+                    ign = (
+                        player_info.last_login_name
+                        if not isinstance(player_info, Exception)
+                        else None
                     )
 
-                    await asyncio.gather(
-                        *(self.safe_send(channel, embed) for channel in channels),
-                        return_exceptions=True
-                    )
+                    if ign:
+                        embed = Embed(color=COLOR_RED)
+                        embed.set_author(
+                            name=f"{ign} left (or was kicked) from the guild",
+                            icon_url=f"https://cravatar.eu/helmavatar/{left_uuids[idx]}/64"
+                        )
 
-                    await asyncio.to_thread(
-                        GuildHandler().set_guild,
-                        left_uuids[idx],
-                        None
-                    )
+                        await asyncio.gather(
+                            *(self.safe_send(channel, embed) for channel in channels),
+                            return_exceptions=True
+                        )
+
+                    try:
+                        await asyncio.to_thread(
+                            GuildHandler().set_guild,
+                            left_uuids[idx],
+                            None
+                        )
+                    except Exception as error:
+                        logger.exception(
+                            f"Failed to update left player {left_uuids[idx]}: {error}"
+                        )
 
         except Exception as error:
             logger.exception(f"Unhandled exception: {error}")

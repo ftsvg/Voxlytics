@@ -60,7 +60,7 @@ class Customize(commands.Cog):
             await self.client.http.request(route, json=payload)
             
             return await interaction.edit_original_response(
-                content=f"Successfully updated the nickname and profile picture."
+                content="Successfully updated the nickname and profile picture."
             )
 
         except discord.HTTPException as http_err:
@@ -104,7 +104,7 @@ class Customize(commands.Cog):
             await self.client.http.request(route, json=payload)
             
             return await interaction.edit_original_response(
-                content=f"Successfully reverted the nickname and avatar to the original."
+                content="Successfully reverted the nickname and avatar to the original."
             )
 
         except discord.HTTPException as http_err:
