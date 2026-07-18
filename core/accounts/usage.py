@@ -74,3 +74,17 @@ class Usage:
             )
             for row in rows
         ]
+        
+    @ensure_cursor
+    def reset_lactate_usage(self, *, cursor: Cursor = None) -> bool:
+        cursor.execute(
+            """
+            UPDATE command_usage
+            SET times_used = 0
+            WHERE command = %s
+            AND discord_id = %s
+            """,
+            ("lactate", self._discord_id)
+        )
+
+        return cursor.rowcount > 0

@@ -74,7 +74,7 @@ class PlaceholderValues:
     def add_footer(self) -> None:
         now = datetime.now(UTC)
         self.text["footer#text"] = [
-            TSpan(value="voxlytics.net • ", fill="#FFFFFF"),
+            TSpan(value="Shine Bot • ", fill="#FFFFFF"),
             TSpan(
                 value=now.strftime(f"%A %d{ordinal(now.day)} %B, %Y"), fill="#AAAAAA"
             ),

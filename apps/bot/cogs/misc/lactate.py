@@ -1,11 +1,15 @@
+import os
 from typing import final, override
 
 from discord.ext import commands
-from discord import app_commands, Interaction, File
+from discord import app_commands, Interaction, File, Member
 
 from core.render2 import PlaceholderValues, RenderingClient
 from core.accounts import Usage
 from core import logger, interaction_check
+
+
+DEVELOPER_ID = int(os.environ.get("DEVELOPER_ID", "0"))
 
 
 @final
@@ -115,7 +119,7 @@ class Lactate(commands.Cog):
                 if not user:
                     try:
                         user = await self.client.fetch_user(entry.discord_id)
-                    except:
+                    except Exception:
                         displayname = f"Unknown ({entry.discord_id})"
                     else:
                         displayname = user.display_name
@@ -149,6 +153,35 @@ class Lactate(commands.Cog):
         if isinstance(error, app_commands.CommandOnCooldown):
             return await interaction.response.send_message(
                 f"You're on cooldown! Try again in **{error.retry_after:.1f}s**",
+            )
+        
+
+    @lactate.command(
+        name="reset",
+        description="Reset users lactate count."
+    )
+    @app_commands.describe(member="The member you want to reset.")
+    async def reset(
+        self, interaction: Interaction, member: Member
+    ):
+        await interaction.response.defer(ephemeral=True)
+        if not interaction.user.guild_permissions.administrator:
+            return await interaction.edit_original_response(
+                content="You do not have the permissions to execute this command."
+            )
+        
+        if interaction.user.id != DEVELOPER_ID:
+            return await interaction.edit_original_response(
+                content="You do not have the permissions to execute this command."
+            )
+        
+        if Usage(discord_id=member.id).reset_lactate_usage():
+            return await interaction.edit_original_response(
+                content=f"Lacatet count has been reset for **{member.name}**"
+            )
+        else:
+            return await interaction.edit_original_response(
+                content="No lactate usage found for that user."
             )
 
 
