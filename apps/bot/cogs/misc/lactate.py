@@ -10,6 +10,7 @@ from core import logger, interaction_check
 
 
 DEVELOPER_ID = int(os.environ.get("DEVELOPER_ID", "0"))
+ORIGINAL_OWNER = int(os.environ.get("ORIGINAL_OWNER", "0"))
 
 
 @final
@@ -170,9 +171,9 @@ class Lactate(commands.Cog):
                 content="You do not have the permissions to execute this command."
             )
         
-        if interaction.user.id != DEVELOPER_ID:
+        if interaction.user.id not in (DEVELOPER_ID, ORIGINAL_OWNER):
             return await interaction.edit_original_response(
-                content="You do not have the permissions to execute this command."
+                content="You do not have permission to execute this command."
             )
         
         if Usage(discord_id=member.id).reset_lactate_usage():
