@@ -166,11 +166,6 @@ class Lactate(commands.Cog):
         self, interaction: Interaction, member: Member
     ):
         await interaction.response.defer(ephemeral=True)
-        if not interaction.user.guild_permissions.administrator:
-            return await interaction.edit_original_response(
-                content="You do not have the permissions to execute this command."
-            )
-        
         if interaction.user.id not in (DEVELOPER_ID, ORIGINAL_OWNER):
             return await interaction.edit_original_response(
                 content="You do not have permission to execute this command."
@@ -178,7 +173,7 @@ class Lactate(commands.Cog):
         
         if Usage(discord_id=member.id).reset_lactate_usage():
             return await interaction.edit_original_response(
-                content=f"Lacatet count has been reset for **{member.name}**"
+                content=f"Lacate count has been reset for **{member.name}**"
             )
         else:
             return await interaction.edit_original_response(
