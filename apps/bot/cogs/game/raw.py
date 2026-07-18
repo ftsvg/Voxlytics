@@ -82,7 +82,7 @@ class StatsRaw(commands.Cog):
                         "description": guild_info.description,
                         "gxp": guild_info.xp,
                         "memberCount": guild_info.member_count,
-                        "ownerUUID": guild_info.owner_uuid,
+                        "ownerUUID": str(guild_info.owner_uuid).replace("-", ""),
                         "creationTime": guild_info.creation_time,
                     } if guild_info else None,
                 },
