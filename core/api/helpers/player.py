@@ -9,41 +9,61 @@ class PlayerInfo:
         player_info: dict | int,
         overall_stats: dict | int,
         game_stats: dict | int,
-        #guild_info: dict | int,
+        guild_info: dict | int,
     ):
         self.uuid = uuid
 
-        self.player_info = player_info
-        self.overall_stats = overall_stats
-        self.game_stats = game_stats
-        #self.guild_info = guild_info
+        self.player_info = player_info if isinstance(player_info, dict) else {}
+        self.overall_stats = overall_stats if isinstance(overall_stats, dict) else {}
+        self.game_stats = game_stats if isinstance(game_stats, dict) else {}
+        self.guild_info = guild_info if isinstance(guild_info, dict) else {}
 
-        self.last_login_name = (player_info.get("lastLoginName") if isinstance(player_info, dict) else None)
-        self.last_login_time = (player_info.get("lastLoginTime") if isinstance(player_info, dict) else None)
-        self.role = player_info.get("role") if isinstance(player_info, dict) else None
+        self.last_login_name = self.player_info.get("lastLoginName")
+        self.last_login_time = self.player_info.get("lastLoginTime")
+        self.role = self.player_info.get("role")
 
-        self.level = (overall_stats.get("level") if isinstance(overall_stats, dict) else 0)
-        self.exp = overall_stats.get("exp") if isinstance(overall_stats, dict) else 0
-        self.weightedwins = (overall_stats.get("weightedwins") if isinstance(overall_stats, dict) else 0)
+        self.level = self.overall_stats.get("level", 0)
+        self.exp = self.overall_stats.get("exp", 0)
+        self.weightedwins = self.overall_stats.get("weightedwins", 0)
 
-        stats = game_stats.get("stats") if isinstance(game_stats, dict) else None
+        stats = self.game_stats.get("stats", {})
+        self.mode_stats = stats if isinstance(stats, dict) else {}
 
-        self.wins = sum(s.get("wins", 0) for s in stats.values()) if stats else 0
-        self.kills = sum(s.get("kills", 0) for s in stats.values()) if stats else 0
-        self.finals = sum(s.get("finals", 0) for s in stats.values()) if stats else 0
-        self.beds = sum(s.get("beds", 0) for s in stats.values()) if stats else 0
+        self.wins = sum(
+            mode_stats.get("wins", 0)
+            for mode_stats in self.mode_stats.values()
+            if isinstance(mode_stats, dict)
+        )
 
-        # self.guild_role = (guild_info.get("guildRole") if isinstance(guild_info, dict) else None)
-        # self.guild_join_time = (guild_info.get("joinTime") if isinstance(guild_info, dict) else None)
-        # self.guild_id = (guild_info.get("guildId") if isinstance(guild_info, dict) else None)
+        self.kills = sum(
+            mode_stats.get("kills", 0)
+            for mode_stats in self.mode_stats.values()
+            if isinstance(mode_stats, dict)
+        )
+
+        self.finals = sum(
+            mode_stats.get("finals", 0)
+            for mode_stats in self.mode_stats.values()
+            if isinstance(mode_stats, dict)
+        )
+
+        self.beds = sum(
+            mode_stats.get("beds", 0)
+            for mode_stats in self.mode_stats.values()
+            if isinstance(mode_stats, dict)
+        )
+
+        self.guild_role = self.guild_info.get("guildRole")
+        self.guild_join_time = self.guild_info.get("joinTime")
+        self.guild_id = self.guild_info.get("guildId")
 
     @classmethod
     async def fetch(cls, uuid: str) -> "PlayerInfo":
         results = await asyncio.gather(
             API.request(VoxylApiEndpoint.PLAYER_INFO, uuid=uuid),
             API.request(VoxylApiEndpoint.PLAYER_OVERALL, uuid=uuid),
-            API.request(VoxylApiEndpoint.PLAYER_STATS, uuid=uuid)
-            # API.request(VoxylApiEndpoint.PLAYER_GUILD, uuid=uuid),
+            API.request(VoxylApiEndpoint.PLAYER_STATS, uuid=uuid),
+            API.request(VoxylApiEndpoint.PLAYER_GUILD, uuid=uuid),
         )
 
         return cls(uuid, *results)
