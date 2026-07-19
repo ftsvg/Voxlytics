@@ -24,6 +24,15 @@ class PrestigeColorMaps:
     }
 
     prestige_map_2 = {
+        2000: (c.DARK_GRAY, c.GRAY, c.WHITE, c.WHITE, c.GRAY, c.GRAY, c.DARK_GRAY),
+        1900: (c.GRAY, c.DARK_PURPLE, c.DARK_PURPLE, c.DARK_PURPLE, c.DARK_PURPLE, c.DARK_GRAY, c.GRAY),
+        1800: (c.GRAY, c.BLUE, c.BLUE, c.BLUE, c.BLUE, c.DARK_BLUE, c.GRAY),
+        1700: (c.GRAY, c.LIGHT_PURPLE, c.LIGHT_PURPLE, c.LIGHT_PURPLE, c.LIGHT_PURPLE, c.DARK_PURPLE, c.GRAY),
+        1600: (c.GRAY, c.RED, c.RED, c.RED, c.RED, c.DARK_RED, c.GRAY),
+        1500: (c.GRAY, c.DARK_AQUA, c.DARK_AQUA, c.DARK_AQUA, c.DARK_AQUA, c.BLUE, c.GRAY),
+        1400: (c.GRAY, c.GREEN, c.GREEN, c.GREEN, c.GREEN, c.DARK_GREEN, c.GRAY),
+        1300: (c.GRAY, c.AQUA, c.AQUA, c.AQUA, c.AQUA, c.DARK_AQUA, c.GRAY),
+        1200: (c.GRAY, c.YELLOW, c.YELLOW, c.YELLOW, c.YELLOW, c.GOLD, c.GRAY),
         1100: (c.GRAY, c.WHITE, c.WHITE, c.WHITE, c.WHITE, c.GRAY, c.GRAY),
         1000: (c.RED, c.GOLD, c.YELLOW, c.GREEN, c.AQUA, c.LIGHT_PURPLE, c.DARK_PURPLE),
     }
