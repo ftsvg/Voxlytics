@@ -6,6 +6,10 @@ from core.database import ensure_cursor, Cursor, async_ensure_cursor
 from .models import ServerConfig, TrackedServerGuilds, TrackedGuilds, TrackedPlayers, LastWeekUpdates
 from .helpers import get_current_week
 
+from datetime import date
+from typing import Literal
+from dataclasses import dataclass
+
 
 class ServerConfigHandler:
     def __init__(self, server_id: int) -> None:
@@ -496,4 +500,143 @@ class LastWeekHandler:
             WHERE id = 1
             """,
             (get_current_week(),)
+        )
+
+@dataclass
+class TrackedGuildSnapshot:
+    id: int
+    guild_id: int
+    gxp: int
+    snapshot_date: date
+
+
+@dataclass
+class GuildSnapshotDifference:
+    guild_id: int
+    current_gxp: int
+    previous_gxp: int
+    gained_gxp: int
+    current_date: date
+    previous_date: date
+
+
+class TrackedGuildSnapshotHandler:
+    @ensure_cursor
+    def insert_snapshots(
+        self,
+        snapshot_date: date | None = None,
+        *,
+        cursor: Cursor = None,
+    ) -> int:
+        cursor.execute(
+            """
+            INSERT INTO tracked_guild_snapshots (
+                guild_id,
+                gxp,
+                snapshot_date
+            )
+            SELECT
+                guild_id,
+                guild_xp,
+                COALESCE(%s, CURDATE())
+            FROM tracked_guilds
+            ON DUPLICATE KEY UPDATE
+                gxp = VALUES(gxp)
+            """,
+            (snapshot_date,),
+        )
+
+        return cursor.rowcount
+
+    @ensure_cursor
+    def has_snapshots(
+        self,
+        snapshot_date: date,
+        *,
+        cursor: Cursor = None,
+    ) -> bool:
+        cursor.execute(
+            """
+            SELECT 1
+            FROM tracked_guild_snapshots
+            WHERE snapshot_date = %s
+            LIMIT 1
+            """,
+            (snapshot_date,),
+        )
+
+        return cursor.fetchone() is not None
+
+    @ensure_cursor
+    def get_snapshot_differences(
+        self,
+        current_date: date,
+        previous_date: date,
+        *,
+        cursor: Cursor = None,
+    ) -> list[GuildSnapshotDifference]:
+        cursor.execute(
+            """
+            SELECT
+                curr.guild_id,
+                curr.gxp AS current_gxp,
+                prev.gxp AS previous_gxp,
+                curr.gxp - prev.gxp AS gained_gxp,
+                curr.snapshot_date AS `current_date`,
+                prev.snapshot_date AS `previous_date`
+            FROM tracked_guild_snapshots AS curr
+            INNER JOIN tracked_guild_snapshots AS prev
+                ON curr.guild_id = prev.guild_id
+            WHERE curr.snapshot_date = %s
+                AND prev.snapshot_date = %s
+            ORDER BY gained_gxp DESC
+            """,
+            (current_date, previous_date),
+        )
+
+        rows = cursor.fetchall()
+
+        return [
+            GuildSnapshotDifference(**row)
+            for row in rows
+        ]
+
+    @ensure_cursor
+    def report_was_sent(
+        self,
+        report_type: Literal["daily", "weekly", "monthly"],
+        report_date: date,
+        *,
+        cursor: Cursor = None,
+    ) -> bool:
+        cursor.execute(
+            """
+            SELECT 1
+            FROM guild_snapshot_reports
+            WHERE report_type = %s
+                AND report_date = %s
+            LIMIT 1
+            """,
+            (report_type, report_date),
+        )
+
+        return cursor.fetchone() is not None
+
+    @ensure_cursor
+    def mark_report_sent(
+        self,
+        report_type: Literal["daily", "weekly", "monthly"],
+        report_date: date,
+        *,
+        cursor: Cursor = None,
+    ) -> None:
+        cursor.execute(
+            """
+            INSERT IGNORE INTO guild_snapshot_reports (
+                report_type,
+                report_date
+            )
+            VALUES (%s, %s)
+            """,
+            (report_type, report_date),
         )

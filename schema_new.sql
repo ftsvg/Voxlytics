@@ -135,3 +135,21 @@ CREATE TABLE backgrounds (
 
     PRIMARY KEY (discord_id)
 );
+
+CREATE TABLE tracked_guild_snapshots (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    guild_id BIGINT NOT NULL,
+    gxp BIGINT NOT NULL,
+    snapshot_date DATE NOT NULL,
+    UNIQUE KEY uq_guild_snapshot_date (guild_id, snapshot_date),
+    INDEX idx_snapshot_date (snapshot_date),
+    FOREIGN KEY (guild_id)
+        REFERENCES tracked_guilds(guild_id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE guild_snapshot_reports (
+    report_type ENUM('daily', 'weekly', 'monthly') NOT NULL,
+    report_date DATE NOT NULL,
+    PRIMARY KEY (report_type, report_date)
+);
