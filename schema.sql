@@ -135,3 +135,8 @@ CREATE TABLE backgrounds (
 
     PRIMARY KEY (discord_id)
 );
+
+CREATE TABLE counting (
+    guild_id BIGINT PRIMARY KEY,
+    enabled BOOLEAN DEFAULT FALSE,
+)

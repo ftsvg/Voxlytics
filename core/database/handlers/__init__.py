@@ -3,6 +3,7 @@ from .session import SessionHandler
 from .historical import HistoricalSnapshotHandler, HistoricalSnapshot
 from .leaderboard import LeaderboardHandler
 from .milestone import MilestoneHandler
+from .counting import CountingHandler
 
 __all__ = [
     "UserHandler",
@@ -10,5 +11,6 @@ __all__ = [
     "HistoricalSnapshotHandler",
     "HistoricalSnapshot",
     "LeaderboardHandler",
-    "MilestoneHandler"
+    "MilestoneHandler",
+    "CountingHandler"
 ]
