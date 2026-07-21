@@ -21,12 +21,18 @@ class MilestoneHandler:
         
         cursor.execute(
             """
-            INSERT INTO milestones (discord_id, uuid, type, value, threshold)
+            INSERT INTO milestones (
+                discord_id,
+                uuid,
+                type,
+                value,
+                threshold
+            )
             VALUES (%s, %s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE
-                value=%s,
-                threshold=%s,
-                notified=%s;
+                value = VALUES(value),
+                threshold = VALUES(threshold),
+                notified = FALSE
             """,
             (
                 self._discord_id,
@@ -34,11 +40,6 @@ class MilestoneHandler:
                 type,
                 value,
                 threshold,
-
-                # Duplicate data
-                value,
-                threshold,
-                False,
             )
         )
 
