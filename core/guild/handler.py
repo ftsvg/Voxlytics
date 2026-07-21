@@ -298,7 +298,7 @@ class GuildHandler:
     async def insert_player(
         self,
         uuid: str,
-        guild_id: int,
+        guild_id: int | None,
         *,
         cursor: Cursor
     ):

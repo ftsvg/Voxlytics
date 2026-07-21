@@ -1,20 +1,19 @@
 import asyncio
 from io import BytesIO
 
+from discord import Embed, File
 from discord.ext import commands, tasks
-from discord import File, Embed
 
-from core import logger, MAIN_COLOR, get_stars_gained
+from core import MAIN_COLOR, get_stars_gained, logger
+from core.api.helpers import PlayerInfo
 from core.guild import (
     GuildHandler,
-    TrackedPlayers,
-    ServerConfigHandler,
     LastWeekHandler,
+    ServerConfigHandler,
+    TrackedPlayers,
+    generate_xp_chart,
     get_current_week,
-    generate_xp_chart
 )
-from core.api.helpers import PlayerInfo
-
 
 
 class WeeklyCharts(commands.Cog):
@@ -58,7 +57,12 @@ class WeeklyCharts(commands.Cog):
                 guild_handler.get_all_tracked_server_guilds
             )
 
-            guild_ids_with_updates = {p.guild_id for p in players if p.guild_id}
+            guild_ids_with_updates = {
+                player.guild_id
+                for player in players
+                if player.guild_id is not None
+            }
+
             notified_channels = set()
 
             for entry in tracked_servers:
@@ -67,8 +71,11 @@ class WeeklyCharts(commands.Cog):
 
                 try:
                     config = await asyncio.to_thread(
-                        ServerConfigHandler(entry.server_id).get_server_config
+                        ServerConfigHandler(
+                            entry.server_id
+                        ).get_server_config
                     )
+
                     if not config or not config.chart_logs:
                         continue
 
@@ -85,7 +92,7 @@ class WeeklyCharts(commands.Cog):
                             "Weekly XP charts is now running, charts for your "
                             "tracked guilds will be sent soon."
                         ),
-                        color=MAIN_COLOR
+                        color=MAIN_COLOR,
                     )
 
                     await channel.send(embed=embed)
@@ -94,9 +101,13 @@ class WeeklyCharts(commands.Cog):
                 except Exception:
                     continue
 
-            guild_map: dict[int, list[TrackedPlayers]] = {}
+            guild_map: dict[int | None, list[TrackedPlayers]] = {}
+
             for player in players:
-                guild_map.setdefault(player.guild_id, []).append(player)
+                guild_map.setdefault(
+                    player.guild_id,
+                    [],
+                ).append(player)
 
             for guild_id, guild_players in guild_map.items():
                 tasks_list = [
@@ -106,7 +117,9 @@ class WeeklyCharts(commands.Cog):
 
                 results = await asyncio.gather(*tasks_list)
 
-                x, y, colors = [], [], []
+                x = []
+                y = []
+                colors = []
                 db_tasks = []
 
                 for player, stats in results:
@@ -118,7 +131,7 @@ class WeeklyCharts(commands.Cog):
                             player.level,
                             player.xp,
                             stats.level,
-                            stats.exp
+                            stats.exp,
                         )
 
                         x.append(stats.last_login_name)
@@ -132,7 +145,7 @@ class WeeklyCharts(commands.Cog):
                                 guild_handler.update_player,
                                 player.uuid,
                                 stats.level,
-                                stats.exp
+                                stats.exp,
                             )
                         )
 
@@ -141,7 +154,7 @@ class WeeklyCharts(commands.Cog):
                                 guild_handler.insert_player_past_week,
                                 player.uuid,
                                 current_week,
-                                gained
+                                gained,
                             )
                         )
 
@@ -150,7 +163,7 @@ class WeeklyCharts(commands.Cog):
                                 asyncio.to_thread(
                                     guild_handler.set_player_highest_week,
                                     player.uuid,
-                                    gained
+                                    gained,
                                 )
                             )
 
@@ -160,8 +173,11 @@ class WeeklyCharts(commands.Cog):
                 if db_tasks:
                     await asyncio.gather(
                         *db_tasks,
-                        return_exceptions=True
+                        return_exceptions=True,
                     )
+
+                if guild_id is None:
+                    continue
 
                 if not x:
                     continue
@@ -171,8 +187,11 @@ class WeeklyCharts(commands.Cog):
                     y,
                     colors,
                     guild_id,
-                    current_week
+                    current_week,
                 )
+
+                if not image_bytes:
+                    continue
 
                 for entry in tracked_servers:
                     if entry.guild_id != guild_id:
@@ -184,6 +203,7 @@ class WeeklyCharts(commands.Cog):
                                 entry.server_id
                             ).get_server_config
                         )
+
                         if not config or not config.chart_logs:
                             continue
 
@@ -191,12 +211,12 @@ class WeeklyCharts(commands.Cog):
                             config.chart_logs
                         )
 
-                        if image_bytes:
-                            file = File(
-                                BytesIO(image_bytes),
-                                filename="xpchart.png"
-                            )
-                            await channel.send(file=file)
+                        file = File(
+                            BytesIO(image_bytes),
+                            filename="xpchart.png",
+                        )
+
+                        await channel.send(file=file)
 
                     except Exception:
                         continue
@@ -205,8 +225,10 @@ class WeeklyCharts(commands.Cog):
                 last_week_handler.update_xp_week
             )
 
-        except Exception as e:
-            logger.exception(f"Weekly charts failed: {e}")
+        except Exception as error:
+            logger.exception(
+                f"Weekly charts failed: {error}"
+            )
 
     @weekly_charts.before_loop
     async def before(self):

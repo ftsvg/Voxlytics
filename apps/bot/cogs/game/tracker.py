@@ -3,9 +3,10 @@ from discord import app_commands, Interaction, TextChannel
 
 from core.api.helpers import GuildInfo
 from core.guild import ServerConfigHandler, GuildHandler
-from core import logger, interaction_check
+from core import logger, interaction_check, fetch_player, mojang_session
 
 from core.guild import TrackerSettingsComponent
+import mcfetch
 
 
 class GuildTracker(commands.Cog):
@@ -230,6 +231,63 @@ class GuildTracker(commands.Cog):
 
             return await interaction.edit_original_response(
                 content="Successfully updated the servers tracked guilds configuration."
+            )
+
+        except Exception as error:
+            logger.exception(f"Unhandled exception: {error}")
+
+            await interaction.edit_original_response(
+                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+            )
+
+
+    @tracker.command(
+        name="add-player",
+        description="Add a player to the tracker"
+    )
+    @app_commands.describe(
+        player="The player you want to track"
+    )
+    async def add_player(
+        self,
+        interaction: Interaction,
+        player: str
+    ):
+        await interaction.response.defer()
+
+        try:
+            result = await interaction_check(interaction.user.id, "tracker_add_player")
+            if result.status == "blacklisted":
+                return await interaction.edit_original_response(
+                    content=result.message
+                )
+
+            if not interaction.user.guild_permissions.administrator:
+                return await interaction.edit_original_response(
+                    content=(
+                        "You don't have the permissions to execute this command. Please ask a server admin to configure the tracker settings."
+                    )
+                )
+
+            if not (result := await fetch_player(interaction, player)):
+                return None
+
+            uuid, player_data = result
+            name = mcfetch.Player(player=uuid, requests_obj=mojang_session).name            
+
+            guild_handler = GuildHandler()
+
+            tracked_player = guild_handler.get_player(uuid)
+            if tracked_player:
+                return await interaction.edit_original_response(
+                    content="This player is already being tracked."
+                )
+
+            guild_id = player_data.guild_id if player_data.guild_id else None
+            await guild_handler.insert_player(uuid, guild_id)
+
+            await interaction.edit_original_response(
+                content=f"**{name}** has successfully been added to the tracker."
             )
 
         except Exception as error:
