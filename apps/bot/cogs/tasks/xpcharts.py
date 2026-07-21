@@ -57,10 +57,15 @@ class WeeklyCharts(commands.Cog):
                 guild_handler.get_all_tracked_server_guilds
             )
 
+            tracked_guild_ids = {
+                entry.guild_id
+                for entry in tracked_servers
+            }
+
             guild_ids_with_updates = {
                 player.guild_id
                 for player in players
-                if player.guild_id is not None
+                if player.guild_id in tracked_guild_ids
             }
 
             notified_channels = set()
@@ -177,6 +182,9 @@ class WeeklyCharts(commands.Cog):
                     )
 
                 if guild_id is None:
+                    continue
+
+                if guild_id not in tracked_guild_ids:
                     continue
 
                 if not x:
