@@ -3,7 +3,7 @@ import os
 from discord import Intents
 from discord.ext import commands
 
-from core import logger
+from core import logger, ApplicationView
 
 
 intents = Intents.all()
@@ -29,6 +29,8 @@ class Client(commands.AutoShardedBot):
 
                     except commands.errors.ExtensionNotFound:
                         logger.error(f"Failed to load {cog[:-3]}")
+
+        self.add_view(ApplicationView())
 
 
     async def on_ready(self):

@@ -5,9 +5,11 @@ from .utils import *
 from .modes import *
 from .interactions import interaction_check
 from .historical import historical_interaction
+from .apps import ApplicationView
 
 __all__ = [
     "logger",
     "historical_interaction",
-    "interaction_check"
+    "interaction_check",
+    "ApplicationView"
 ]
