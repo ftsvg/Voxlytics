@@ -107,8 +107,6 @@ class Prestige(commands.Cog):
         name="prestige", 
         description="Get your projected stats based on a session"
     )
-    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    @app_commands.allowed_installs(guilds=True, users=True)
     @app_commands.describe(
         level="The level to get projected stats for",
         player="The player you want to view",
@@ -121,7 +119,13 @@ class Prestige(commands.Cog):
     ):
         await interaction.response.defer()
         try:
-            result = await interaction_check(interaction.user.id, 'prestige')
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='prestige',
+            )
+            
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
@@ -150,7 +154,7 @@ class Prestige(commands.Cog):
             
             if level <= player_level:
                 return await interaction.edit_original_response(
-                    content=f"Level must be higher than the player's current level."
+                    content="Level must be higher than the player's current level."
                 )
             
             skin_model = await SKINS_API.fetch_skin_model(uuid)
@@ -178,13 +182,13 @@ class Prestige(commands.Cog):
             img_bytes = await renderer.render_to_buffer(background_img)
             
             await interaction.edit_original_response(
-                attachments=[File(img_bytes, filename=f"projected.png")]
+                attachments=[File(img_bytes, filename="projected.png")]
             )
 
         except Exception as error:
             logger.exception("Unhandled exception: %s", error)
             await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+                content="Something went wrong. If this issue persists, please contact a **Shine Administrator**."
             ) 
 
 

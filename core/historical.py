@@ -106,9 +106,9 @@ class HistoricalPeriodSelect(Select):
                 )
             else:
                 description = (
-                    f"+0.0✫, "
-                    f"+0 wins, "
-                    f"+0 weightedwins"
+                    "+0.0✫, "
+                    "+0 wins, "
+                    "+0 weightedwins"
                 )
 
             options.append(
@@ -217,10 +217,12 @@ async def historical_interaction(
 ) -> None:
     try:
         result = await interaction_check(
-            interaction.user.id,
-            f"historical_{period.lower()}"
+            discord_id=interaction.user.id,
+            guild_id=interaction.guild.id,
+            role_ids=[role.id for role in interaction.user.roles],
+            command_name='historical',
         )
-
+            
         if result.status == "blacklisted":
             return await interaction.edit_original_response(
                 content=result.message

@@ -35,7 +35,7 @@ class SessionStatsRenderer(RenderingClient):
     def placeholder_values(self) -> PlaceholderValues:
 
         text_placeholders = {
-            "title#text": f"Session Stats",
+            "title#text": "Session Stats",
             "wins#text": f"{self._session.wins:,}",
             "weighted#text": f"{self._session.weighted:,}",
             "kills#text": f"{self._session.kills:,}",
@@ -63,9 +63,7 @@ class Session(commands.Cog):
 
     session = app_commands.Group(
         name="session",
-        description="View and manage sessions",
-        allowed_contexts=app_commands.AppCommandContext(guild=True, dm_channel=True, private_channel=True),
-        allowed_installs=app_commands.AppInstallationType(guild=True, user=True)
+        description="View and manage sessions"
     )
 
 
@@ -81,7 +79,13 @@ class Session(commands.Cog):
     ):
         await interaction.response.defer()
         try:
-            result = await interaction_check(interaction.user.id, 'session_view')
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='session_view',
+            )
+            
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
@@ -129,14 +133,14 @@ class Session(commands.Cog):
 
             await interaction.edit_original_response(
                 content=f"<a:mc_clock:1494030376505708575> Started on <t:{start_time}:F>",
-                attachments=[File(img_bytes, filename=f"session.png")]
+                attachments=[File(img_bytes, filename="session.png")]
             )            
             
         except Exception as error:
             logger.exception(f"Unhandled exception: {error}")
 
             await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+                content="Something went wrong. If this issue persists, please contact a **Shine Administrator**."
             )
 
 
@@ -150,7 +154,13 @@ class Session(commands.Cog):
     ):
         await interaction.response.defer()
         try:
-            result = await interaction_check(interaction.user.id, 'session_reset')
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='session_reset',
+            )
+            
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
@@ -183,7 +193,7 @@ class Session(commands.Cog):
             logger.exception(f"Unhandled exception: {error}")
 
             await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+                content="Something went wrong. If this issue persists, please contact a **Shine Administrator**."
             )
 
 async def setup(client: commands.Bot) -> None:

@@ -34,9 +34,17 @@ class Preview(commands.Cog):
         await interaction.response.defer()
 
         try:
-            result = await interaction_check(interaction.user.id, "tracker_config")
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='preview_xp',
+            )
+            
             if result.status == "blacklisted":
-                return await interaction.edit_original_response(content=result.message)
+                return await interaction.edit_original_response(
+                    content=result.message
+                )
 
             config_handler = ServerConfigHandler(interaction.guild.id)
             tracked = config_handler.get_tracked_server_guilds()
@@ -122,9 +130,17 @@ class Preview(commands.Cog):
         await interaction.response.defer()
 
         try:
-            result = await interaction_check(interaction.user.id, "tracker_config")
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='preview_gxp',
+            )
+            
             if result.status == "blacklisted":
-                return await interaction.edit_original_response(content=result.message)
+                return await interaction.edit_original_response(
+                    content=result.message
+                )
 
             config_handler = ServerConfigHandler(interaction.guild.id)
             tracked = config_handler.get_tracked_server_guilds()

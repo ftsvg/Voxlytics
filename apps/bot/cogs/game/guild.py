@@ -68,13 +68,7 @@ class Guild(commands.Cog):
 
     guild = app_commands.Group(
         name="guild",
-        description="Guild related commands",
-        allowed_contexts=app_commands.AppCommandContext(
-            guild=True, dm_channel=True, private_channel=True
-        ),
-        allowed_installs=app_commands.AppInstallationType(
-            guild=True, user=True
-        )
+        description="Guild related commands"
     )
 
     @guild.command(
@@ -85,9 +79,17 @@ class Guild(commands.Cog):
     async def info(self, interaction: Interaction, tag: str):
         await interaction.response.defer()
         try:
-            result = await interaction_check(interaction.user.id, "guild_info")
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='guild_info',
+            )
+            
             if result.status == "blacklisted":
-                return await interaction.edit_original_response(content=result.message)
+                return await interaction.edit_original_response(
+                    content=result.message
+                )
 
             data = await GuildInfo.fetch(tag)
             if not data:
@@ -122,7 +124,7 @@ class Guild(commands.Cog):
         except Exception as error:
             logger.exception(f"Unhandled exception: {error}")
             await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+                content="Something went wrong. If this issue persists, please contact a **Shine Administrator**."
             )
 
 

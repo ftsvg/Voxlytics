@@ -57,13 +57,8 @@ class Lactate(commands.Cog):
 
     lactate = app_commands.Group(
         name="lactate",
-        description="Lactate related commands",
-        allowed_contexts=app_commands.AppCommandContext(
-            guild=True, dm_channel=True, private_channel=True
-        ),
-        allowed_installs=app_commands.AppInstallationType(guild=True, user=True),
+        description="Lactate related commands"
     )
-
 
     @lactate.command(
         name="use", description="Lactate"
@@ -72,7 +67,13 @@ class Lactate(commands.Cog):
     async def use(self, interaction: Interaction):
         await interaction.response.defer()
         try:
-            result = await interaction_check(interaction.user.id, 'lactate')
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='lactate',
+            )
+            
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
@@ -86,7 +87,7 @@ class Lactate(commands.Cog):
             logger.exception(f"Unhandled exception: {error}")
 
             await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+                content="Something went wrong. If this issue persists, please contact a **Shine Administrator**."
             )
 
         
@@ -98,12 +99,17 @@ class Lactate(commands.Cog):
         await interaction.response.defer()
 
         try:
-            result = await interaction_check(interaction.user.id, 'lactate_leaderboard')
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='lactate_leaderboard',
+            )
+            
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
                 )
-
 
             usage_list = Usage().get_top_lactate_users()
 
@@ -145,7 +151,7 @@ class Lactate(commands.Cog):
             logger.exception(f"Unhandled exception: {error}")
 
             await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+                content="Something went wrong. If this issue persists, please contact a **Shine Administrator**."
             )
 
 

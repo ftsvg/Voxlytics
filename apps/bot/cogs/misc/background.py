@@ -19,11 +19,7 @@ class Backgrounds(commands.Cog):
 
     background = app_commands.Group(
         name="background",
-        description="Background related commands",
-        allowed_contexts=app_commands.AppCommandContext(
-            guild=True, dm_channel=True, private_channel=True
-        ),
-        allowed_installs=app_commands.AppInstallationType(guild=True, user=True),
+        description="Background related commands"
     )
 
 
@@ -63,10 +59,12 @@ class Backgrounds(commands.Cog):
             await interaction.response.defer()
 
             result = await interaction_check(
-                interaction.user.id,
-                "background_set"
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='background_set',
             )
-
+            
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
@@ -99,7 +97,7 @@ class Backgrounds(commands.Cog):
             logger.exception(f"Unhandled exception: {error}")
 
             await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+                content="Something went wrong. If this issue persists, please contact a **Shine Administrator**."
             )
 
 
@@ -115,7 +113,13 @@ class Backgrounds(commands.Cog):
     ):
         await interaction.response.defer()
         try:
-            result = await interaction_check(interaction.user.id, 'background_request')
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='background_request',
+            )
+            
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
@@ -145,7 +149,7 @@ class Backgrounds(commands.Cog):
             logger.exception(f"Unhandled exception: {error}")
 
             await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+                content="Something went wrong. If this issue persists, please contact a **Shine Administrator**."
             )
 
     @background.command(

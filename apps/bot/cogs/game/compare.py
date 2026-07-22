@@ -132,8 +132,6 @@ class Compare(commands.Cog):
         name="compare", 
         description="Compare player's stats to another player's stats"
     )
-    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    @app_commands.allowed_installs(guilds=True, users=True)
     @app_commands.describe(
         player_1="The primary player", 
         player_2="The secondary player"
@@ -147,7 +145,13 @@ class Compare(commands.Cog):
         await interaction.response.defer()
 
         try:
-            result = await interaction_check(interaction.user.id, 'compare')
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='compare',
+            )
+            
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
@@ -190,7 +194,7 @@ class Compare(commands.Cog):
             logger.exception(f"Unhandled exception: {error}")
 
             await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+                content="Something went wrong. If this issue persists, please contact a **Shine Administrator**."
             )
 
 async def setup(client: commands.Bot) -> None:

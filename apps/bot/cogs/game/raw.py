@@ -28,7 +28,13 @@ class StatsRaw(commands.Cog):
         await interaction.response.defer()
 
         try:
-            result = await interaction_check(interaction.user.id, "stats")
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='stats_raw',
+            )
+            
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
@@ -102,7 +108,7 @@ class StatsRaw(commands.Cog):
         except Exception as error:
             logger.exception("Unhandled exception: %s", error)
             await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+                content="Something went wrong. If this issue persists, please contact a **Shine Administrator**."
             )
 
 

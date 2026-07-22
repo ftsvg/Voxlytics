@@ -13,11 +13,7 @@ class Milestones(commands.Cog):
 
     milestone = app_commands.Group(
         name="milestone",
-        description="Miletone related commands",
-        allowed_contexts=app_commands.AppCommandContext(
-            guild=True, dm_channel=True, private_channel=True
-        ),
-        allowed_installs=app_commands.AppInstallationType(guild=True, user=True),
+        description="Miletone related commands"
     )
 
 
@@ -48,7 +44,13 @@ class Milestones(commands.Cog):
     ):
         await interaction.response.defer()
         try:
-            result = await interaction_check(interaction.user.id, 'milestone_add')
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='milestone_add',
+            )
+            
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
@@ -67,7 +69,7 @@ class Milestones(commands.Cog):
             player_stats = await PlayerInfo.fetch(uuid)
             if not player_stats:
                 return await interaction.edit_original_response(
-                    content="Failed to fetch stats. If this issue persists, please contact the **Voxlytics Dev Team**."
+                    content="Failed to fetch stats. If this issue persists, please contact a **Shine Administrator**."
                 )
             
             if type.value == "wins":
@@ -115,7 +117,7 @@ class Milestones(commands.Cog):
             logger.exception(f"Unhandled exception: {error}")
 
             await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+                content="Something went wrong. If this issue persists, please contact a **Shine Administrator**."
             )
 
 
@@ -127,7 +129,13 @@ class Milestones(commands.Cog):
         await interaction.response.defer()
 
         try:
-            result = await interaction_check(interaction.user.id, 'milestone_list')
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='milestone_list',
+            )
+            
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
@@ -184,7 +192,7 @@ class Milestones(commands.Cog):
             logger.exception(f"Unhandled exception: {error}")
 
             await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+                content="Something went wrong. If this issue persists, please contact a **Shine Administrator**."
             )
 
 
@@ -212,7 +220,13 @@ class Milestones(commands.Cog):
         await interaction.response.defer()
 
         try:
-            result = await interaction_check(interaction.user.id, 'milestone_remove')
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='milestone_remove',
+            )
+            
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
@@ -244,7 +258,7 @@ class Milestones(commands.Cog):
             logger.exception(f"Unhandled exception: {error}")
 
             await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+                content="Something went wrong. If this issue persists, please contact a **Shine Administrator**."
             )
 
 

@@ -12,8 +12,6 @@ class Historical(commands.Cog):
         name="historical",
         description="View historical stats"
     )
-    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    @app_commands.allowed_installs(guilds=True, users=True)
     @app_commands.describe(player="The player you want to view")
     async def historical(
         self,

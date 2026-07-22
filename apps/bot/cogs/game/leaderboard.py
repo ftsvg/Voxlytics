@@ -19,11 +19,7 @@ class Leaderboard(commands.Cog):
 
     leaderboard = app_commands.Group(
         name="leaderboard",
-        description="Leaderboard related commands",
-        allowed_contexts=app_commands.AppCommandContext(
-            guild=True, dm_channel=True, private_channel=True
-        ),
-        allowed_installs=app_commands.AppInstallationType(guild=True, user=True),
+        description="Leaderboard related commands"
     )
 
     async def _send_leaderboard(
@@ -84,7 +80,13 @@ class Leaderboard(commands.Cog):
     async def level(self, interaction: Interaction, page: int = 1):
         await interaction.response.defer()
         try:
-            result = await interaction_check(interaction.user.id, 'leaderboard_level')
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='leaderboard_level',
+            )
+            
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
@@ -95,7 +97,7 @@ class Leaderboard(commands.Cog):
         except Exception as error:
             logger.exception(f"Unhandled exception: {error}")
             await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+                content="Something went wrong. If this issue persists, please contact a **Shine Administrator**."
             )
 
 
@@ -108,7 +110,13 @@ class Leaderboard(commands.Cog):
     async def weightedwins(self, interaction: Interaction, page: int = 1):
         await interaction.response.defer()
         try:
-            result = await interaction_check(interaction.user.id, 'leaderboard_weightedwins')
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='leaderboard_weightedwins',
+            )
+            
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
@@ -119,7 +127,7 @@ class Leaderboard(commands.Cog):
         except Exception as error:
             logger.exception(f"Unhandled exception: {error}")
             await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+                content="Something went wrong. If this issue persists, please contact a **Shine Administrator**."
             )
 
 

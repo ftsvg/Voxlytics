@@ -16,8 +16,6 @@ class Linking(commands.Cog):
         name="link", 
         description="Link your account"
     )
-    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    @app_commands.allowed_installs(guilds=True, users=True)
     @app_commands.describe(player="The player you want to link to")
     async def link(
         self,
@@ -26,7 +24,13 @@ class Linking(commands.Cog):
     ):
         await interaction.response.defer()
         try:
-            result = await interaction_check(interaction.user.id, 'link')
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='link',
+            )
+            
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
@@ -51,7 +55,7 @@ class Linking(commands.Cog):
             if not isinstance(integration.discord_from_player, dict) \
             or not isinstance(integration.player_from_discord, dict):
                 content = (
-                    f"Player Not Integrated To Voxyl Network!\n"
+                    "Player Not Integrated To Voxyl Network!\n"
                     "- To successfully link your account, please ensure that "
                     "you're using the correct IGN and Discord account that is integrated to the Voxyl Network.\n"
                     "- Join the [Official Bedwarspractice Discord](<https://discord.gg/7Mt7T8hqr4>) and go into the integration channel."
@@ -80,7 +84,7 @@ class Linking(commands.Cog):
             logger.exception(f"Unhandled exception: {error}")
 
             await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+                content="Something went wrong. If this issue persists, please contact a **Shine Administrator**."
             )
 
 
@@ -88,15 +92,19 @@ class Linking(commands.Cog):
         name="unlink", 
         description="Unlink your account"
     )
-    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    @app_commands.allowed_installs(guilds=True, users=True)
     async def unlink(
         self, 
         interaction: Interaction
     ):
         await interaction.response.defer()
         try:
-            result = await interaction_check(interaction.user.id, 'unlink')
+            result = await interaction_check(
+                discord_id=interaction.user.id,
+                guild_id=interaction.guild.id,
+                role_ids=[role.id for role in interaction.user.roles],
+                command_name='unlink',
+            )
+            
             if result.status == "blacklisted":
                 return await interaction.edit_original_response(
                     content=result.message
@@ -121,7 +129,7 @@ class Linking(commands.Cog):
             logger.exception(f"Unhandled exception: {error}")
 
             await interaction.edit_original_response(
-                content="Something went wrong. If this issue persists, please contact the **Voxlytics Dev Team**."
+                content="Something went wrong. If this issue persists, please contact a **Shine Administrator**."
             )
 
 
